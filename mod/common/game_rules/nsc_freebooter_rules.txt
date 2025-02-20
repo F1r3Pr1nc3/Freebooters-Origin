@@ -1,0 +1,102 @@
+# This = leader, leader we'd like to trade
+# Root = country, country that owns the leader currently
+# From = country, country that would receive the leader
+can_trade_leader = {
+	this = {
+		OR = {
+			# has_leader_flag = tradable_leader
+			has_specialist_subject_leader_trait = yes
+			# Freebooters Origin
+			root = { is_freebooter_empire = yes }
+		}
+		is_councilor = no
+		is_heir = no
+	}
+	OR = {
+		AND = {
+			root = {
+				is_subject = yes
+			}
+			from = {
+				is_overlord_to = root
+			}
+		}
+		AND = {
+			root = {
+				has_valid_civic = civic_machine_tactical_algorithms
+			}
+			from = {
+				NOR = {
+					has_valid_civic = civic_machine_tactical_algorithms
+					is_fallen_empire = yes
+					any_owned_leader = { has_trait = leader_trait_tactical_algorithms }
+				}
+			}
+		}
+	}
+	OR = {
+		AND = {
+			root = {
+				is_regular_empire = yes
+				NOR = {
+					is_country_type = gate_builders
+					is_country_type = awakened_marauders
+				}
+			}
+			from = {
+				is_regular_empire = yes
+				NOR = {
+					is_country_type = gate_builders
+					is_country_type = awakened_marauders
+				}
+			}
+		}
+		AND = {
+			root = {
+				is_machine_empire = yes
+			}
+			from = {
+				is_machine_empire = yes
+			}
+		}
+		AND = {
+			root = {
+				is_hive_empire = yes
+			}
+			from = {
+				is_hive_empire = yes
+			}
+		}
+		AND = {
+			root = {
+				has_valid_civic = civic_machine_tactical_algorithms
+			}
+			from = {
+				OR = {
+					is_regular_empire = yes
+					is_hive_empire = yes
+					is_machine_empire = yes
+				}
+				NOR = {
+					has_country_flag = no_murdering_tactical_leaders
+					any_owned_leader = {
+						has_trait = leader_trait_tactical_algorithms
+					}
+				}
+			}
+		}
+	}
+	# Can't trade gestalt nodes
+	is_gestalt_node = no
+	# The overlord can't be a fallen or awakened empire.
+	root = {
+		NAND = {
+			is_overlord = yes
+			is_fallen_empire = yes
+		}
+	}
+	NOR = {
+		has_trait = leader_trait_fotd_scientist
+		has_trait = leader_trait_fotd_commander
+	}
+}

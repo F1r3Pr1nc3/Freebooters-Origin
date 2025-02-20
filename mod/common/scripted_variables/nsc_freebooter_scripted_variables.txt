@@ -1,0 +1,1 @@
+@has_nsc_freebooter_mod = 1

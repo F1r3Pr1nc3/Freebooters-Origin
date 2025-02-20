@@ -1,0 +1,120 @@
+system_fortification_complex = {
+	entity = ""
+	construction_entity = "station_generic_01_entity"
+	portrait = "GFX_megastructure_construction_background"
+	place_entity_on_planet_plane = yes
+	entity_offset = { x = 0 y = 0 }
+	scales_with_planet = no
+	show_galactic_map_icon = no
+	show_in_outliner = no
+	build_time = 300
+
+	starbase = starbase_level_marauder # starbase_level_starport
+
+	resources = {
+		category = megastructures
+		cost = { alloys = 300 influence = 50 }
+	}
+	construction_blocks_and_blocked_by = none
+
+	potential = { has_technology = tech_system_fortification_complex }
+
+	possible = {
+		hidden_trigger = { exists = starbase }
+		custom_tooltip = { fail_text = "requires_inside_border" is_inside_border = from }
+	}
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = { fail_text = "requires_surveyed_planet" is_surveyed = { who = prev.from status = yes } } # Prevent leaking habitability information
+			custom_tooltip = { fail_text = "requires_not_star" is_star = no }
+			custom_tooltip = { fail_text = "requires_no_anomaly" has_anomaly = no }
+			custom_tooltip = {
+				fail_text = "requires_not_hostile_or_primitive"
+				planet_is_hostile_or_crisis = no
+				NAND = {
+					has_owner = yes
+					owner = { is_primitive = yes }
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				can_build_megastructure_on_planet = yes
+				# NOR = {
+				# 	has_planet_flag = megastructure
+				# 	# AND = {
+				# 	# 	has_planet_flag = has_megastructure
+				# 	# 	# Special exception so you can build an orbital ring even if you have MSI's warship as a habitat.
+				# 	# 	NOT = { has_planet_flag = has_payback_habitat }
+				# 	# 	NAND = { # Allow habitats
+				# 	# 		exists = orbit
+				# 	# 		orbit = { is_scope_type = planet merg_is_habitat = yes }
+				# 	# 	}
+				# 	# }
+				# 	has_planet_flag = ruined_orbital_ring_planet
+				# 	solar_system = { has_star_flag = ring_world_built }
+				# }
+				# has_any_megastructure = no
+				NOR = { has_ringworld_output_boost = yes merg_is_habitat = yes }
+				OR = { is_artificial = no merg_is_relic_world = yes }
+				# Bug workaround # (not allow orbitals and habitats)
+				NAND = {
+					exists = orbit
+					orbit = { is_scope_type = planet merg_is_habitat = yes }
+				}
+				has_orbital_station = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_debris"
+				NOT = { has_planet_flag = has_orbital_debris }
+			}
+			NAND = {
+				from = { is_ai = yes }
+				num_pops < 25
+			}
+		}
+	}
+
+	# root = system
+	# from = country
+	ai_weight = {
+		factor = 5
+
+		modifier = { factor = 3 solar_system = { has_owner = yes is_same_value = owner.capital_scope.solar_system } }
+		modifier = { factor = 2 any_neighbor_system = { has_owner = yes is_same_value = owner.capital_scope.solar_system } }
+
+		modifier = { factor = 0.1
+			any_neighbor_system = {
+				has_owner = yes
+				owner = { NOT = { is_same_value = from } }
+			}
+		}
+		modifier = { factor = 3
+			any_system_colony = {
+				num_pops >= 50
+				NOT = { exists = orbital_defence }
+			}
+		}
+	}
+
+	on_build_start = {}
+	on_build_cancel = {}
+
+	on_build_complete = {
+		fromfrom.planet = {
+			set_planet_flag = has_megastructure
+
+			if = {
+				limit = { has_orbital_station = yes }
+				orbital_station = { dismantle = yes }
+			}
+			create_starbase = {
+				size = starbase_marauder # starbase_starport
+				owner = from
+				# module = <starbase_module>
+				# building = <starbase_building>
+				effect = { }
+			}
+		}
+		remove_megastructure = fromfrom
+	}
+}

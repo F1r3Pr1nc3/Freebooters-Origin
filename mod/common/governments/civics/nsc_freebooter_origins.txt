@@ -1,0 +1,218 @@
+origin_nsc_freebooter = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origins_nsc_freebooter.dds" # "gfx/interface/icons/origins/origins_khan_successor.dds"
+	picture = GFX_origin_nsc_freebooter
+
+	starting_colony = pc_habitat # pc_nsc_freebooter_habitat
+	initializers = {
+		nsc_freebooter_system
+		nsc_freebooter_system_sol
+	}
+	habitability_preference = pc_habitat # pc_nsc_freebooter_habitat
+	max_once_global = yes
+	preferred_planet_class_neighbor = no
+
+	playable = {
+		host_has_dlc = Apocalypse # Marauder is for apoc dlc
+		has_federations_dlc = no
+	}
+
+	possible = {
+		species_archetype = { NOT = { value = MACHINE } }
+		ethics = {
+			NOT = { value = ethic_gestalt_consciousness }
+			NOR = {
+				text = civic_tooltip_not_pacifist
+				value = ethic_pacifist
+				value = ethic_fanatic_pacifist
+			}
+		}
+		authority = {
+			NOR = {
+				# value = auth_corporate
+				value = auth_democratic
+				value = auth_imperial
+				# value = auth_hive_mind
+				# value = auth_machine_intelligence
+			}
+		}
+		civics = {
+			# NOR = {
+			# 	text = civic_tooltip_not_mutagenic
+			# 	value = civic_toxic_baths
+			# 	value = civic_toxic_baths_individual_machine
+			# 	value = civic_corporate_toxic_baths
+			# 	value = civic_corporate_toxic_baths_individual_machine
+			# 	value = civic_hive_toxic_baths
+			# 	value = civic_machine_toxic_baths
+			# }
+			NOR = {
+				text = civic_tooltip_not_relentless_industrialists
+				value = civic_relentless_industrialists
+				value = civic_corporate_relentless_industrialists
+			}
+			NOR = {
+				text = civic_tooltip_not_guided
+				value = civic_guided_sapience
+				value = civic_corporate_guided_sapience
+				value = civic_hive_guided_sapience
+				value = civic_machine_guided_sapience
+			}
+			NOR = {
+				text = civic_tooltip_not_idyllic_bloom
+				value = civic_idyllic_bloom
+				value = civic_hive_idyllic_bloom
+			}
+			NOT = { value = civic_agrarian_idyll }
+			NOR = {
+				text = civic_tooltip_not_anglers
+				value = civic_anglers
+				value = civic_corporate_anglers
+				value = civic_machine_anglers
+				value = civic_corporate_machine_anglers
+			}
+			NOR = {
+				value = civic_pompous_purists
+				value = civic_inwards_perfection
+				value = civic_machine_assimilator
+			}
+		}
+	}
+
+	description = "origin_nsc_freebooter_effect_tooltip"
+
+	potential = {
+		species_archetype = { NOT = { value = MACHINE } }
+	}
+
+	modifier = {
+		station_gatherers_produces_mult = 1.0
+		country_power_projection_influence_produces_add = 2
+		commander_initial_skill = 1
+	}
+	can_build_ruler_ship = yes
+
+	flags = { custom_start_screen }
+
+	traits = {
+		trait = trait_nsc_freebooter
+	}
+
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 0
+	}
+}
+
+origin_nsc_freebooter_federations = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origins_nsc_freebooter.dds"
+	picture = GFX_origin_nsc_freebooter
+
+	starting_colony = pc_habitat # pc_nsc_freebooter_habitat
+	initializers = {
+		nsc_freebooter_system
+		nsc_freebooter_system_sol
+		void_dweller_system
+		sol_system_void_dweller_system
+	}
+	habitability_preference = pc_habitat # pc_nsc_freebooter_habitat
+	max_once_global = yes
+	preferred_planet_class_neighbor = no
+
+	playable = {
+		host_has_dlc = Apocalypse # Marauder is for apoc dlc
+		host_has_dlc = Federations
+	}
+
+	possible = {
+		species_archetype = { NOT = { value = MACHINE } }
+		ethics = {
+			NOT = { value = ethic_gestalt_consciousness }
+			NOR = {
+				text = civic_tooltip_not_pacifist
+				value = ethic_pacifist
+				value = ethic_fanatic_pacifist
+			}
+		}
+		authority = {
+			NOR = {
+				# value = auth_corporate
+				value = auth_democratic
+				value = auth_imperial
+				# value = auth_hive_mind
+				# value = auth_machine_intelligence
+			}
+		}
+		civics = {
+			# NOR = {
+			# 	text = civic_tooltip_not_mutagenic
+			# 	value = civic_toxic_baths
+			# 	value = civic_toxic_baths_individual_machine
+			# 	value = civic_corporate_toxic_baths
+			# 	value = civic_corporate_toxic_baths_individual_machine
+			# 	value = civic_hive_toxic_baths
+			# 	value = civic_machine_toxic_baths
+			# }
+			NOR = {
+				text = civic_tooltip_not_relentless_industrialists
+				value = civic_relentless_industrialists
+				value = civic_corporate_relentless_industrialists
+			}
+			NOR = {
+				text = civic_tooltip_not_guided
+				value = civic_guided_sapience
+				value = civic_corporate_guided_sapience
+				value = civic_hive_guided_sapience
+				value = civic_machine_guided_sapience
+			}
+			NOR = {
+				text = civic_tooltip_not_idyllic_bloom
+				value = civic_idyllic_bloom
+				value = civic_hive_idyllic_bloom
+			}
+			NOT = { value = civic_agrarian_idyll }
+			NOR = {
+				text = civic_tooltip_not_anglers
+				value = civic_anglers
+				value = civic_corporate_anglers
+				value = civic_machine_anglers
+				value = civic_corporate_machine_anglers
+			}
+			NOR = {
+				value = civic_pompous_purists
+				value = civic_inwards_perfection
+				value = civic_machine_assimilator
+			}
+		}
+	}
+
+	description = "origin_nsc_freebooter_effect_tooltip"
+
+	potential = {
+		species_archetype = { NOT = { value = MACHINE } }
+	}
+
+	modifier = {
+		station_gatherers_produces_mult = 1.0
+		country_power_projection_influence_produces_add = 2
+		megastructures_habitat_cost_mult = -0.25
+		habitat_districts_building_slots_add = 0.25
+		habitat_max_districts_add = 2
+		habitat_district_jobs_add = 1
+	}
+	can_build_ruler_ship = yes
+
+	flags = { custom_start_screen }
+
+	traits = {
+		trait = trait_nsc_freebooter
+	}
+
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 0
+	}
+}

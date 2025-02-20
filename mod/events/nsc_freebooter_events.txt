@@ -1,0 +1,4272 @@
+namespace = nsc_freebooter
+# Unique game start event (on empire_init_capital_planet)
+# Called during empire initialization when starting a new game if has_secondary_species game rule is true.
+# Called before empire_init_create_capital_pops.
+# scope: planet
+# from: founder species
+# fromfrom: secondary species (if exists)
+# At this point the species might have changed (because we added traits), so fromfrom might not be the secondary species anymore
+planet_event = {
+	id = nsc_freebooter.1
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		merg_is_habitat = yes
+		owner = { is_freebooter_empire = yes }
+	}
+	immediate = {
+		log = "ORIGIN_NSC_FREEBOOTER_START_SETUP \\[This.Owner.GetName]"
+		remove_district = district_city
+		remove_district = district_farming
+		remove_district = district_generator
+		remove_district = district_hab_mining
+		remove_district = district_hab_industrial
+		remove_district = district_hab_housing
+		# remove_district = district_hab_energy used
+		# remove_district = district_hab_science used
+		remove_building = building_commercial_zone
+		set_planet_flag = toxic_knights_habitat
+		# add_deposit = d_knights_calibrator
+		# add_deposit = d_toxic_god_blight_upon_the_land
+		# add_deposit = d_toxic_god_pestilential_wasteland
+		add_deposit = d_msi_air_freshener		# TODO quest
+		set_colony_type = col_capital_nsc_freebooter
+		add_deposit = d_nsc_freebooter_habitat
+		# REMOVED redundancy void_dweller_home_planet_setup
+		# while = { count = 28 # Changed to match that of the vanilla
+		# 	create_pop = { species = owner_species }
+		# }
+		add_building = building_hab_major_capital		# building_capital
+		add_building = building_bureaucratic_1
+		add_building = building_research_lab_1
+		add_building = building_foundry_1
+		while = { count = 2
+			# add_district = { district_type = district_nsc_freebooter_hab_housing ignore_cap = yes }
+			# add_district = { district_type = district_hab_housing ignore_cap = yes }
+			add_district = { district_type = district_nsc_freebooter_hab_foundry ignore_cap = yes }
+		}
+		if = {
+			limit = { owner = { is_lithoid_empire = no } }
+			add_district = { district_type = district_nsc_freebooter_hab_farming ignore_cap = yes }
+			# add_district = { district_type = district_hab_mining ignore_cap = yes }
+		}
+		else = {
+			while = { count = 2
+				add_district = { district_type = district_nsc_freebooter_hab_mining ignore_cap = yes }
+			}
+		}
+		if = {
+			limit = { owner = { is_gestalt = no } }
+			add_district = { district_type = district_nsc_freebooter_hab_factory ignore_cap = yes }
+		}
+		# add_district_and_planet_size_if_needed_effect = { district = district_ }
+		if = {
+			limit = { planet_size < 12 }
+			set_planet_size = 12			# Possible gets overridden
+		}
+		owner = {
+			give_technology = { tech = tech_nsc_freebooter_boarding_pod_1 message = no }
+		}
+	}
+}
+
+# on_press_begin
+country_event = {
+	id = nsc_freebooter.2
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		is_freebooter_empire = yes
+		exists = capital_scope
+		capital_scope = { merg_is_habitat = yes }
+	}
+	immediate = {
+		# set_global_flag = has_nsc_freebooters_mod
+		owner_species = { save_event_target_as = freebooter_species }
+		set_spawn_system_batch = begin
+		capital_scope = {
+			if = {
+				limit = { planet_size < 12 }
+				log = "Increase Freebooter Capital Habitat"
+				set_planet_size = 12
+			}
+			if = {
+				limit = { NOT = { is_planet_class = pc_habitat } }
+				log = "Change Freebooter Capital Habitat"
+				change_pc = pc_habitat
+			}
+			remove_district = district_city
+			remove_district = district_farming
+			remove_district = district_generator
+			remove_district = district_hab_mining
+			remove_district = district_hab_industrial
+			remove_district = district_hab_housing
+			# remove_district = district_hab_science # Added later
+			# remove_district = district_hab_energy # Added later
+			set_planet_flag = toxic_knights_habitat
+			add_district = { district_type = district_nsc_freebooter_hab_housing ignore_cap = yes }
+			add_district = { district_type = district_nsc_freebooter_hab_housing ignore_cap = yes }
+			solar_system = {
+				every_system_planet = {
+					limit = {
+						OR = {
+							has_planet_flag = habitat_1_planet
+							has_planet_flag = habitat_2_planet
+							has_planet_flag = habitat_3_planet
+						}
+					}
+					switch = { trigger = has_planet_flag
+						habitat_1_planet = { remove_planet_flag = habitat_1_planet }
+						habitat_2_planet = { remove_planet_flag = habitat_2_planet }
+						habitat_3_planet = { remove_planet_flag = habitat_3_planet }
+					}
+				}
+			}
+
+			spawn_system = {
+				min_jumps = 1 max_jumps = 2
+				min_distance = 10
+				max_distance = 30
+				initializer = neighbor_t1_first_colony
+				hyperlane = yes
+				is_discovered = no
+			}
+			add_extra_hyperlane_to_spawned_system_effect = yes
+			spawn_system = {
+				min_jumps = 1 max_jumps = 4
+				min_distance = 10
+				max_distance = 40
+				initializer = neighbor_t2_second_colony
+				hyperlane = yes
+				is_discovered = no
+			}
+			add_extra_hyperlane_to_spawned_system_effect = yes
+
+			solar_system = {
+				closest_system = {
+					limit = {
+						has_star_flag = neighbor_t1_first_colony
+						any_system_planet = { is_colonizable = yes is_colony = no }
+					}
+					min_steps = 1
+					max_steps = 3
+					random_system_planet = {
+						limit = { is_colonizable = yes is_colony = no }
+						# change_pc = "pc_tropical"
+						# select_pre_ftl_origin = yes
+						event_target:freebooter_species = {
+							create_species = {
+								is_mod = yes # This creates automaticaly a new species name
+								name = this
+								plural = this
+								class = this
+								portrait = this
+								traits = this
+								can_be_modified = this
+								homeworld = this
+								namelist = this
+								gender = this
+								traits = {
+									ideal_planet_class = this
+									# trait = "trait_rapid_breeders"						# +2
+									# trait = "trait_conformists"							# +2
+									# trait = "trait_strong"								# +1
+									# trait = "trait_adaptive"							# +2
+									trait = "trait_communal"							# +1
+									trait = "trait_resilient"							# +1
+									trait = "trait_fleeting"							# -1
+									trait = "trait_unruly"								# -2
+									trait = "trait_nomadic"
+									# trait = "trait_limited_regeneration"
+									# trait = "trait_deviants
+								}
+							}
+						}
+
+						create_late_pre_ftl_empire = yes
+						setup_pre_ftl_planet = yes
+						pre_ftl_clean_up_effect = yes
+						change_colony_foundation_date = -461
+						while = { count = 3
+							create_army = {
+								owner = last_created_country
+								type = primitive_additional_army
+								species = last_created_species
+							}
+						}
+						# Somehow vanilla bug
+						last_created_country = {
+							if = {
+								limit = { is_homicidal = yes }
+								force_remove_civic = civic_fanatic_purifiers
+								force_remove_civic = civic_machine_terminator
+								force_remove_civic = civic_hive_devouring_swarm
+							}
+							set_origin = origin_nsc_freebooter
+							set_country_flag = early_space_age
+							country_event = { id = preftl.1099 days = 450 }
+						}
+					}
+				}
+				reroll_random = yes
+				# Vespid
+				closest_system = {
+					limit = {
+						has_star_flag = neighbor_t2_second_colony
+						any_system_planet = { is_colonizable = yes is_colony = no }
+					}
+					min_steps = 1
+					max_steps = 4
+					random_system_planet = {
+						limit = { is_colonizable = yes is_colony = no }
+						change_pc = "pc_desert"
+						# select_pre_ftl_origin = yes
+						event_target:freebooter_species = {
+							create_species = {
+								is_mod = yes # This creates automaticaly a new species name
+								name = this
+								plural = this
+								class = this
+								portrait = this
+								traits = this
+								can_be_modified = this
+								homeworld = this
+								namelist = this
+								gender = this
+								traits = {
+									ideal_planet_class = this
+									# trait = "trait_intelligent"								# They have a unique form of communication and intelligence.
+									# trait = "trait_conformists"								# They are loyal to their leaders.
+									trait = "trait_strong"									# +1
+									trait = "trait_slow_breeders"							# Reflecting their low reproduction rate.
+									trait = "trait_enduring"								# Resilience and ability to withstand damage
+									trait = "trait_adaptive"								# +2 # Ability to survive in harsh environments
+								}
+							}
+						}
+						create_late_pre_ftl_empire = yes
+						setup_pre_ftl_planet = yes
+						pre_ftl_clean_up_effect = yes
+						change_colony_foundation_date = -1275
+						while = { count = 3
+							create_army = {
+								owner = last_created_country
+								type = primitive_additional_army
+								species = last_created_species
+							}
+						}
+					}
+					# Somehow vanilla bug
+					last_created_country = {
+						if = {
+							limit = { is_homicidal = yes }
+							force_remove_civic = civic_fanatic_purifiers
+							force_remove_civic = civic_machine_terminator
+							force_remove_civic = civic_hive_devouring_swarm
+						}
+						set_origin = origin_nsc_freebooter
+						set_country_flag = early_space_age
+						country_event = { id = preftl.1099 days = 540 }
+					}
+				}
+			}
+		}
+		set_spawn_system_batch = end
+	}
+	after = {
+		if = {
+			limit = { has_grand_archive_dlc = yes }
+			owner = { set_origin = origin_treasure_hunters }
+		}
+	}
+}
+
+## 'trait_nsc_freebooter' trait change event 1
+# pop_event = {
+# 	id = nsc_freebooter.2
+# 	hide_window = yes
+# 	is_triggered_only = yes
+# 	trigger = { nsc_freebooter_trait_change_event_trigger = yes }
+# 	immediate = { nsc_freebooter_trait_change_event_effect = yes }
+# }
+# The Khan conquers Worlds
+country_event = {
+	id = nsc_freebooter.3
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		is_war_leader = yes
+		any_war = {
+			any_attacker = { is_same_value = prevprev }
+			# Will not trigger if the war goal is the subjugation (satrapy)
+			using_war_goal = { type = wg_nsc_freebooter_wrath_of_khan owner = prev }
+		}
+	}
+	immediate = {
+		from = {
+			change_variable = { which = "nsc_freebooter_planets_lost_to_khan_var" value = 1 }
+		}
+		if = {
+			limit = {
+				from = {
+					is_ai = yes
+					is_homicidal = no
+					check_variable = { which = "nsc_freebooter_planets_lost_to_khan_var" value >= 10 }
+					OR = {
+						relative_power = { who = prev.this category = fleet value = inferior }
+						relative_power = { who = prev.this category = fleet value = pathetic }
+					}
+				}
+			}
+			country_event = { id = nsc_freebooter.4 }
+		}
+	}
+}
+
+# AI empire surrender to the Khan
+country_event = {
+	id = nsc_freebooter.4
+	title = "nsc_freebooter.4.name"
+	desc = "nsc_freebooter.4.desc"
+	picture = GFX_evt_surrender
+	show_sound = relic_activation_khans_throne
+	is_triggered_only = yes
+	option = {
+		name = "nsc_freebooter.4.a"		# Haha Good
+		custom_tooltip = nsc_freebooter.4.a.tooltip
+		hidden_effect = {
+			fromfrom = {
+				if = {
+					limit = { is_overlord = yes }
+					every_subject = {
+						set_subject_of = { who = root preset = preset_nsc_freebooter_satrapy }
+						hidden_effect = {
+							create_fleet = {
+								effect = {
+									set_owner = from.root
+									create_ship = {
+										name = "NAME_Garrison_Base"
+										design = "NAME_Void_Dwelling"
+										graphical_culture = "pirate_01"
+									}
+									set_location = { target = root.capital_scope distance = 50 angle = random }
+								}
+							}
+							# add_modifier = { modifier = "satrapy_of_horde" }
+						}
+					}
+				}
+				set_subject_of = { who = root preset = preset_nsc_freebooter_satrapy }
+				create_fleet = {
+					effect = {
+						set_owner = from.root
+						create_ship = {
+							name = "NAME_Garrison_Base"
+							design = "NAME_Void_Dwelling"
+							graphical_culture = "pirate_01"
+						}
+						set_location = { target = root.capital_scope distance = 50 angle = random }
+					}
+				}
+				# add_modifier = { modifier = "satrapy_of_horde" }
+				observer_event = { id = observer.19 }
+				every_playable_country = {
+					limit = { is_ai = no has_communications = prev }
+					country_event = { id = marauder.552 }
+				}
+			}
+		}
+	}
+	option = {
+		name = "nsc_freebooter.4.b"		# Nooooo! I will eat you all!
+	}
+}
+
+country_event = {
+	id = nsc_freebooter.5062	# paragon.5062
+	title = "paragon.5062.name"
+	desc = "nsc_freebooter.5062.desc"
+	picture = GFX_evt_alien_propaganda	# GFX_evt_acquire_asset
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	trigger = {
+		exists = ruler
+		ruler = { has_leader_flag = paragon_origin_legendary_leader }
+	}
+	immediate = {
+		# Change to Imperial (option) name = paragon.5020.a custom_tooltip = paragon.5020.a.tt
+		# set_origin = origin_legendary_leader_imperial
+		# shift_ethic = ethic_fanatic_egalitarian
+		change_government = { authority = auth_imperial remove_invalid_civics = yes }
+		country_event = { id = paragon.5021 days = 90 }		# Coronation (5-15 years paragon.5050) # Forgotten
+		set_policy = { policy = war_philosophy option = liberation_wars cooldown = yes }
+		set_country_flag = took_reformists_side
+		create_khan_dummy = yes
+		event_target:nsc_freebooter_khan_flagship_admiral = {
+			set_leader_flag = legendary_leader
+			set_leader_flag = leader_death_events_blocked
+			set_leader_flag = paragon_origin_legendary_leader
+			set_leader_flag = immune_to_negative_traits
+			# add_skill = 5
+		}
+		# custom_tooltip = paragon.5210.d.tt
+		add_modifier = { modifier = paragon_origin_reformists_empire }		# From paragon_origin_forgotten
+		while = { count = value:paragon_take_10pr_pops
+			random_owned_pop = {
+				limit = { NOT = { pop_has_ethic = ethic_egalitarian } }
+				pop_change_ethic = ethic_egalitarian
+			}
+		}
+		export_trigger_value_to_variable = { trigger = count_owned_planet variable = max_reformists_planets }
+		change_variable = { which = max_reformists_planets value = -1 }
+		divide_variable = { which = max_reformists_planets value = 2.1 }
+		ceiling_variable = max_reformists_planets
+		if = {
+			limit = {
+				any_system_within_border = {
+					is_capital_system = no
+					any_system_colony = { is_owned_by = root is_controlled_by = root }
+				}
+			}
+			random_system_within_border = {
+				limit = {
+					is_capital_system = no
+					any_system_colony = { is_owned_by = root is_controlled_by = root }
+				}
+				random_system_colony = { save_event_target_as = first_reformist_planet }
+			}
+		}
+		else = {
+			capital_scope = { save_event_target_as = first_reformist_planet }
+		}
+	}
+	option = {
+		name = paragon.5062.a
+		custom_tooltip = paragon.5062.a.tt
+		event_target:first_reformist_planet = {
+			hidden_effect = {
+				while = { count = 2
+					random_owned_pop = {
+						limit = { NOT = { pop_has_ethic = ethic_egalitarian } }
+						pop_change_ethic = ethic_egalitarian
+					}
+				}
+			}
+			add_modifier = { modifier = paragon_origin_reformists clear_on_owner_change = yes }
+		}
+		while = { count = max_reformists_planets
+			random_system_within_border = {
+				limit = {
+					is_capital_system = no
+					any_system_colony = {
+						is_owned_by = root
+						is_controlled_by = root
+						NOT = { has_modifier = paragon_origin_reformists }
+						any_owned_pop = { pop_has_ethic = ethic_egalitarian }
+					}
+				}
+				random_system_colony = {
+					limit = {
+						has_owner = yes
+						is_owned_by = root
+						is_controlled_by = root
+						NOT = { has_modifier = paragon_origin_reformists }
+						any_owned_pop = { pop_has_ethic = ethic_egalitarian }
+					}
+					add_modifier = { modifier = paragon_origin_reformists clear_on_owner_change = yes }
+				}
+			}
+		}
+		start_situation = { type = paragon_origin_reformists_struggle }
+	}
+	after = {
+		hidden_effect = {
+			# set_origin = origin_legendary_leader_death
+			set_variable = { which = paragon_origin_delusion_tier value = 0 }
+			add_modifier = { modifier = paragon_origin_rebel_player }
+			# paragon_origin_launch_rebelion = yes
+			# country_event = { id = paragon.5211 days = 15 random = 15 } # Notification Started the war
+			ordered_owned_planet = {
+				limit = {
+					num_pops > 10
+					planet_stability > 35
+					solar_system = { is_capital_system = no }					# NOT = { is_planet = prev.capital_scope }
+				}
+				position = 0
+				order_by = trigger:num_pops
+				add_modifier = { modifier = pop_disappearances years = 5 }
+			}
+		}
+	}
+}
+
+# ap_nsc_freebooter_wrath_of_khan effect event
+country_event = {
+	id = nsc_freebooter.5
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		set_name = "marauder.640.name"		# "The Galactic Khanate" TODO?
+		force_add_civic = nsc_freebooter_civic_great_khans_vision
+		# change_country_flag = { Do it later with special project
+		# 	icon = { category = "pirate" file = "flag_pirate_11.dds" }
+		# 	background = { category = "backgrounds" file = "00_solid.dds" }
+		# 	colors = { "red" "red" "null" "null" }
+		# }
+		ruler = {
+			add_trait = nsc_freebooter_leader_trait_ruler_great_khan
+			# set_skill = 10
+			add_trait_no_notify = leader_trait_legendary_leader
+			add_trait_no_notify = subclass_commander_councilor
+			# add_skill_without_trait_selection = 5
+			add_skill = 5
+			set_leader_flag = legendary_leader
+			set_leader_flag = leader_death_events_blocked
+			set_leader_flag = paragon_origin_legendary_leader
+			set_leader_flag = immune_to_negative_traits
+			set_variable = { which = paragon_origin_story_ruling value = 4 }
+			set_variable = { which = paragon_origin_delusion_tier value = 1 }
+			set_random_commander_background_effect = yes
+		}
+		# country_event = { id = paragon.5004 } # paragon_origin_promise
+		# on_monthly = {
+		# 	events = { paragon.5006 } # Calculation utility event
+		# 	random_events = { 800 = 0
+		# 		2 = paragon.5120 # Some planets can't recieve signal and they want to have it
+		# 		2 = paragon.5130 # Workers want more power, protests
+		# 		2 = paragon.5140 # Military forces are on the rise
+		# 		2 = paragon.5150 # Nepotism on the rise
+		# 		1 = paragon.5110 # create_pirates
+		# 	}
+		# }
+		# paragon.5012 "United!" Monument
+		random_owned_planet = {
+			limit = {
+				is_capital = no
+				solar_system = { is_capital_system = no }
+			}
+			planet_event = { id = paragon.5013 days = 1 }			# Just story_ruling
+		}
+		# paragon.5008 # Situation finished - bad
+		# paragon.5210 Need paragon_origin_reformists
+		# Mid Story Event: Reformists and Mad Rule
+		## "Civil War" Starts paragon_origin_reformists_struggle
+		set_country_flag = paragon_origin_purges
+		country_event = { id = nsc_freebooter.5062 days = 14 }
+	}
+}
+
+# When the Khan has killed in action (on_ship_destroyed_victim- compare marauder.505)
+# This = owner of ship 1 (destroyed)
+# From = owner of ship 2 (combatant)
+# fromfrom = ship 1
+# fromfromfrom = ship 2
+country_event = {
+	id = nsc_freebooter.6
+	title = "nsc_freebooter.6.name"
+	desc = "nsc_freebooter.6.desc"
+	picture = GFX_evt_space_funeral
+	is_triggered_only = yes
+	trigger = {
+		is_freebooter_empire = yes
+		fromfrom = {
+			exists = leader
+			NAND = {
+				exists = fleet
+				fleet = { num_ships > 1 }
+			}
+			leader = { has_trait = nsc_freebooter_admiral_trait_great_khan }
+		}
+	}
+	immediate = {
+		set_country_flag = nsc_freebooter_khan_killed_in_action_flag
+		ruler = {
+			kill_leader = { show_notification = no }
+		}
+	}
+	option = {
+		name = nsc_freebooter.6.a
+		add_modifier = { modifier = nsc_freebooter_death_of_khan_empire_modifier years = 1 }
+	}
+}
+
+# # The market entrance
+# country_event = {
+# 	id = nsc_freebooter.7
+# 	title = "nsc_freebooter.7.name"
+# 	desc = "nsc_freebooter.7.desc"
+# 	diplomatic = yes
+# 	show_sound = event_pre_ftl_civilization
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.7.a		# Click to sell an admiral
+# 		custom_tooltip = nsc_freebooter.7.a.tooltip
+# 		allow = {
+# 			any_owned_leader = { leader_class = commander }
+# 		}
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.8 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.7.b		# Click to sell a fleet
+# 		allow = {
+# 			any_owned_ship = {
+# 				OR = { is_ship_class = shipclass_military is_ship_class = shipclass_military_special }
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.7.b.tooltip
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.14 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.7.end
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 	}
+# }
+# # Admiral market
+# country_event = {
+# 	id = nsc_freebooter.8
+# 	title = "nsc_freebooter.8.name"
+# 	desc = "nsc_freebooter.8.desc"
+# 	diplomatic = yes
+# 	show_sound = event_pre_ftl_civilization
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	immediate = { nsc_freebooter_empire_admiral_market_target_selection = yes }
+# 	option = {
+# 		name = nsc_freebooter.8.a
+# 		trigger = {
+# 			NOT = { exists = event_target:nsc_freebooter_empire_admiral_market_target }
+# 		}
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.9 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.8.a
+# 		trigger = { exists = event_target:nsc_freebooter_empire_admiral_market_target }
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.10 }
+# 		}
+# 	}
+# }
+# # If there is no one wants to buy your admiral
+# country_event = {
+# 	id = nsc_freebooter.9
+# 	title = "nsc_freebooter.8.name"
+# 	desc = "nsc_freebooter.9.desc"
+# 	diplomatic = yes
+# 	show_sound = event_ghost_town
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.9.a
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 	}
+# }
+# # If there is a one wants to buy your admiral
+# country_event = {
+# 	id = nsc_freebooter.10
+# 	title = "nsc_freebooter.8.name"
+# 	desc = "nsc_freebooter.10.desc"
+# 	diplomatic = yes
+# 	show_sound = cute_molluscoid_starfish_greetings
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = event_target:nsc_freebooter_empire_admiral_market_target.ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.10.a
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.12 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.10.end		# Close the window
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 		hidden_effect = {
+# 			random_list = {
+# 				95 = { }
+# 				5 = { modifier = { factor = 0 NOT = { exists = event_target:nsc_freebooter_customer_empire_biggest_enemy } } country_event = { id = nsc_freebooter.11 } }
+# 			}
+# 		}
+# 	}
+# }
+# # If you rejected but the opponent wants the trade so much
+# country_event = {
+# 	id = nsc_freebooter.11
+# 	title = "nsc_freebooter.8.name"
+# 	desc = "nsc_freebooter.11.desc"
+# 	diplomatic = yes
+# 	show_sound = cute_molluscoid_snail_greetings
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = event_target:nsc_freebooter_empire_admiral_market_target.ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.11.a
+# 		custom_tooltip = nsc_freebooter.11.a.tooltip
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_admiral_market_target = { set_country_flag = nsc_freebooter_empire_admiral_market_target_pay_double }
+# 			country_event = { id = nsc_freebooter.12 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.11.end		# Close the window
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 		event_target:nsc_freebooter_empire_admiral_market_target = {
+# 			add_opinion_modifier = { who = root modifier = nsc_freebooter_opinion_desperate_offer_rejected_admiral_market }
+# 		}
+# 	}
+# }
+# Sell leader
+# country_event = {
+# 	id = nsc_freebooter.12
+# 	title = "nsc_freebooter.8.name"
+# 	desc = "nsc_freebooter.12.desc"
+# 	diplomatic = yes
+# 	show_sound = cute_molluscoid_starfish_greetings
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = event_target:nsc_freebooter_empire_admiral_market_target.ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	immediate = { nsc_freebooter_admiral_market_selected_target_count_effect = yes }
+# 	option = {
+# 		name = nsc_freebooter.12.a
+# 		trigger = { exists = event_target:nsc_freebooter_admiral_market_selected_leader_1 }
+# 		allow = { nsc_freebooter_admiral_market_sell_trigger_1 = yes }
+# 		nsc_freebooter_admiral_market_sell_effect_1 = yes
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.12.b
+# 		trigger = { exists = event_target:nsc_freebooter_admiral_market_selected_leader_2 }
+# 		allow = { nsc_freebooter_admiral_market_sell_trigger_2 = yes }
+# 		nsc_freebooter_admiral_market_sell_effect_2 = yes
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.12.c
+# 		trigger = { exists = event_target:nsc_freebooter_admiral_market_selected_leader_3 }
+# 		allow = { nsc_freebooter_admiral_market_sell_trigger_3 = yes }
+# 		nsc_freebooter_admiral_market_sell_effect_3 = yes
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.12.d
+# 		trigger = { exists = event_target:nsc_freebooter_admiral_market_selected_leader_4 }
+# 		allow = { nsc_freebooter_admiral_market_sell_trigger_4 = yes }
+# 		nsc_freebooter_admiral_market_sell_effect_4 = yes
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.12.e
+# 		trigger = { exists = event_target:nsc_freebooter_admiral_market_selected_leader_5 }
+# 		allow = { nsc_freebooter_admiral_market_sell_trigger_5 = yes }
+# 		nsc_freebooter_admiral_market_sell_effect_5 = yes
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.12.f
+# 		trigger = { exists = event_target:nsc_freebooter_admiral_market_selected_leader_6 }
+# 		allow = { nsc_freebooter_admiral_market_sell_trigger_6 = yes }
+# 		nsc_freebooter_admiral_market_sell_effect_6 = yes
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.12.end_alt		# Close the window
+# 		trigger = {
+# 			event_target:nsc_freebooter_empire_admiral_market_target = {
+# 				has_resource = { type = energy amount >= 200 }
+# 				has_resource = { type = energy amount < 400 }
+# 			}
+# 			count_owned_leader = { limit = { leader_class = commander has_skill = 1 } count = 0 }
+# 		}
+# 		custom_tooltip = nsc_freebooter.12.end_alt.tooltip
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.13 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.10.end		# Close the window
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 	}
+# }
+# country_event = {
+# 	id = nsc_freebooter.13
+# 	title = "nsc_freebooter.8.name"
+# 	desc = "nsc_freebooter.13.desc"
+# 	diplomatic = yes
+# 	show_sound = event_ground_battle
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.7.end
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 		event_target:nsc_freebooter_empire_admiral_market_target = {
+# 			add_opinion_modifier = { who = root modifier = nsc_freebooter_opinion_you_hit_me }
+# 		}
+# 	}
+# }
+# # Ship market
+# country_event = {
+# 	id = nsc_freebooter.14
+# 	title = "nsc_freebooter.14.name"
+# 	desc = "nsc_freebooter.14.desc"
+# 	diplomatic = yes
+# 	show_sound = event_pre_ftl_civilization
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	immediate = { nsc_freebooter_empire_fleet_market_target_selection = yes }
+# 	option = {
+# 		name = nsc_freebooter.8.a
+# 		trigger = {
+# 			NOT = { exists = event_target:nsc_freebooter_empire_fleet_market_target }
+# 		}
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.9 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.8.a
+# 		trigger = { exists = event_target:nsc_freebooter_empire_fleet_market_target }
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.15 }
+# 		}
+# 	}
+# }
+# # If there is a one wants to buy your ships
+# country_event = {
+# 	id = nsc_freebooter.15
+# 	title = "nsc_freebooter.14.name"
+# 	desc = "nsc_freebooter.15.desc"
+# 	diplomatic = yes
+# 	show_sound = cute_molluscoid_starfish_greetings
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = event_target:nsc_freebooter_empire_fleet_market_target.ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.10.a
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.10.end		# Close the window
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 		hidden_effect = {
+# 			random_list = {
+# 				95 = { }
+# 				5 = { modifier = { factor = 0 NOT = { exists = event_target:nsc_freebooter_customer_empire_biggest_enemy } } country_event = { id = nsc_freebooter.16 } }
+# 			}
+# 		}
+# 	}
+# }
+# # If you rejected but the opponent wants the trade so much
+# country_event = {
+# 	id = nsc_freebooter.16
+# 	title = "nsc_freebooter.14.name"
+# 	desc = "nsc_freebooter.11.desc"
+# 	diplomatic = yes
+# 	show_sound = cute_molluscoid_snail_greetings
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = event_target:nsc_freebooter_empire_fleet_market_target.ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.11.a
+# 		custom_tooltip = nsc_freebooter.16.a.tooltip
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = { set_country_flag = nsc_freebooter_empire_fleet_market_target_pay_double }
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.11.end		# Close the window
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_opinion_modifier = { who = root modifier = nsc_freebooter_opinion_desperate_offer_rejected_fleet_market }
+# 		}
+# 	}
+# }
+# # Sell ships
+# country_event = {
+# 	id = nsc_freebooter.17
+# 	title = "nsc_freebooter.14.name"
+# 	desc = "nsc_freebooter.17.desc"
+# 	diplomatic = yes
+# 	show_sound = cute_molluscoid_starfish_greetings
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = event_target:nsc_freebooter_empire_fleet_market_target.ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.17.1		# corvette
+# 		trigger = {
+# 			any_owned_ship = { is_ship_size = corvette is_in_combat = no }
+# 		}
+# 		allow = {
+# 			custom_tooltip_fail = {
+# 				text = nsc_freebooter.17.option.fail
+# 				event_target:nsc_freebooter_empire_fleet_market_target = {
+# 					has_resource = { type = energy amount >= 500 }
+# 				}
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.17.1.tooltip
+# 		add_resource = { energy = 500 influence = 5 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_resource = { energy = -500 }
+# 		}
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				create_fleet = {
+# 					effect = {
+# 						set_owner = root						# For 'random_existing_desing' line to use the player's random design, not the AI's
+# 						create_ship = { name = random random_existing_design = corvette graphical_culture = root }
+# 						set_location = prev.capital_star.starbase
+# 						set_owner = prev
+# 					}
+# 				}
+# 				set_country_flag = already_bought_fleet_from_nsc_freebooter_empire
+# 			}
+# 			random_owned_ship = {
+# 				limit = { is_ship_size = corvette is_in_combat = no }
+# 				if = {
+# 					limit = { exists = leader }
+# 					leader = { unassign_leader = this }
+# 				}
+# 				delete_ship = this
+# 			}
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.17.2		# destroyer
+# 		trigger = {
+# 			any_owned_ship = { is_ship_size = destroyer is_in_combat = no }
+# 		}
+# 		allow = {
+# 			custom_tooltip_fail = {
+# 				text = nsc_freebooter.17.option.fail
+# 				event_target:nsc_freebooter_empire_fleet_market_target = {
+# 					has_resource = { type = energy amount >= 1000 }
+# 				}
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.17.2.tooltip
+# 		add_resource = { energy = 1000 influence = 10 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_resource = { energy = -1000 }
+# 		}
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				create_fleet = {
+# 					effect = {
+# 						set_owner = root
+# 						create_ship = { name = random random_existing_design = destroyer graphical_culture = root }
+# 						set_location = prev.capital_star.starbase
+# 						set_owner = prev
+# 					}
+# 				}
+# 				set_country_flag = already_bought_fleet_from_nsc_freebooter_empire
+# 			}
+# 			random_owned_ship = {
+# 				limit = { is_ship_size = destroyer is_in_combat = no }
+# 				if = {
+# 					limit = { exists = leader }
+# 					leader = { unassign_leader = this }
+# 				}
+# 				delete_ship = this
+# 			}
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.17.3		# cruiser
+# 		trigger = {
+# 			any_owned_ship = { is_ship_size = cruiser is_in_combat = no }
+# 		}
+# 		allow = {
+# 			custom_tooltip_fail = {
+# 				text = nsc_freebooter.17.option.fail
+# 				event_target:nsc_freebooter_empire_fleet_market_target = {
+# 					has_resource = { type = energy amount >= 1500 }
+# 				}
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.17.3.tooltip
+# 		add_resource = { energy = 1500 influence = 15 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_resource = { energy = -1500 }
+# 		}
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				create_fleet = {
+# 					effect = {
+# 						set_owner = root
+# 						create_ship = { name = random random_existing_design = cruiser graphical_culture = root }
+# 						set_location = prev.capital_star.starbase
+# 						set_owner = prev
+# 					}
+# 				}
+# 				set_country_flag = already_bought_fleet_from_nsc_freebooter_empire
+# 			}
+# 			random_owned_ship = {
+# 				limit = { is_ship_size = cruiser is_in_combat = no }
+# 				if = {
+# 					limit = { exists = leader }
+# 					leader = { unassign_leader = this }
+# 				}
+# 				delete_ship = this
+# 			}
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.17.4		# battleship
+# 		trigger = {
+# 			any_owned_ship = { is_ship_size = battleship is_in_combat = no }
+# 		}
+# 		allow = {
+# 			custom_tooltip_fail = {
+# 				text = nsc_freebooter.17.option.fail
+# 				event_target:nsc_freebooter_empire_fleet_market_target = {
+# 					has_resource = { type = energy amount >= 2000 }
+# 				}
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.17.4.tooltip
+# 		add_resource = { energy = 2000 influence = 20 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_resource = { energy = -2000 }
+# 		}
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				create_fleet = {
+# 					effect = {
+# 						set_owner = root
+# 						create_ship = { name = random random_existing_design = battleship graphical_culture = root }
+# 						set_location = prev.capital_star.starbase
+# 						set_owner = prev
+# 					}
+# 				}
+# 				set_country_flag = already_bought_fleet_from_nsc_freebooter_empire
+# 			}
+# 			random_owned_ship = {
+# 				limit = { is_ship_size = battleship is_in_combat = no }
+# 				if = {
+# 					limit = { exists = leader }
+# 					leader = { unassign_leader = this }
+# 				}
+# 				delete_ship = this
+# 			}
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.17.5		# titan
+# 		trigger = {
+# 			any_owned_ship = { is_ship_size = titan is_in_combat = no }
+# 		}
+# 		allow = {
+# 			custom_tooltip_fail = {
+# 				text = nsc_freebooter.17.option.fail
+# 				event_target:nsc_freebooter_empire_fleet_market_target = {
+# 					has_resource = { type = energy amount >= 4000 }
+# 				}
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.17.5.tooltip
+# 		add_resource = { energy = 4000 influence = 40 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_resource = { energy = -4000 }
+# 		}
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				create_fleet = {
+# 					effect = {
+# 						set_owner = root
+# 						create_ship = { name = random random_existing_design = titan graphical_culture = root }
+# 						set_location = prev.capital_star.starbase
+# 						set_owner = prev
+# 					}
+# 				}
+# 				set_country_flag = already_bought_fleet_from_nsc_freebooter_empire
+# 			}
+# 			random_owned_ship = {
+# 				limit = { is_ship_size = titan is_in_combat = no }
+# 				if = {
+# 					limit = { exists = leader }
+# 					leader = { unassign_leader = this }
+# 				}
+# 				delete_ship = this
+# 			}
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.17.6		# colossus
+# 		trigger = {
+# 			any_owned_ship = { is_ship_size = colossus is_in_combat = no }
+# 		}
+# 		allow = {
+# 			custom_tooltip_fail = {
+# 				text = nsc_freebooter.17.option.fail
+# 				event_target:nsc_freebooter_empire_fleet_market_target = {
+# 					has_resource = { type = energy amount >= 10000 }
+# 				}
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.17.6.tooltip
+# 		add_resource = { energy = 10000 influence = 200 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_resource = { energy = -10000 }
+# 		}
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				create_fleet = {
+# 					effect = {
+# 						set_owner = root
+# 						create_ship = { name = random random_existing_design = colossus graphical_culture = root }
+# 						set_location = prev.capital_star.starbase
+# 						set_owner = prev
+# 					}
+# 				}
+# 				set_country_flag = already_bought_fleet_from_nsc_freebooter_empire
+# 			}
+# 			random_owned_ship = {
+# 				limit = { is_ship_size = colossus is_in_combat = no }
+# 				if = {
+# 					limit = { exists = leader }
+# 					leader = { unassign_leader = this }
+# 				}
+# 				delete_ship = this
+# 			}
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.17.7		# juggernaut
+# 		trigger = {
+# 			any_owned_ship = { is_ship_size = juggernaut is_in_combat = no }
+# 		}
+# 		allow = {
+# 			custom_tooltip_fail = {
+# 				text = nsc_freebooter.17.option.fail
+# 				event_target:nsc_freebooter_empire_fleet_market_target = {
+# 					has_resource = { type = energy amount >= 10000 }
+# 				}
+# 			}
+# 		}
+# 		custom_tooltip = nsc_freebooter.17.7.tooltip
+# 		add_resource = { energy = 10000 influence = 200 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_resource = { energy = -10000 }
+# 		}
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				create_fleet = {
+# 					effect = {
+# 						set_owner = root
+# 						create_ship = { name = random random_existing_design = juggernaut graphical_culture = root }
+# 						set_location = prev.capital_star.starbase
+# 						set_owner = prev
+# 					}
+# 				}
+# 				set_country_flag = already_bought_fleet_from_nsc_freebooter_empire
+# 			}
+# 			random_owned_ship = {
+# 				limit = { is_ship_size = juggernaut is_in_combat = no }
+# 				if = {
+# 					limit = { exists = leader }
+# 					leader = { unassign_leader = this }
+# 				}
+# 				delete_ship = this
+# 			}
+# 			country_event = { id = nsc_freebooter.17 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.12.end_alt		# Close the window
+# 		trigger = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = {
+# 				NOT = { has_country_flag = already_bought_fleet_from_nsc_freebooter_empire }
+# 				has_resource = { type = energy amount >= 500 }
+# 				has_resource = { type = energy amount < 1000 }
+# 			}
+# 			count_owned_ship = { limit = { is_ship_size = corvette } count = 0 }
+# 		}
+# 		custom_tooltip = nsc_freebooter.12.end_alt.tooltip
+# 		hidden_effect = {
+# 			country_event = { id = nsc_freebooter.18 }
+# 		}
+# 	}
+# 	option = {
+# 		name = nsc_freebooter.17.end		# Close the window
+# 		custom_tooltip = nsc_freebooter.9.a.tooltip
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 		hidden_effect = {
+# 			event_target:nsc_freebooter_empire_fleet_market_target = { remove_country_flag = already_bought_fleet_from_nsc_freebooter_empire }
+# 		}
+# 	}
+# }
+# country_event = {
+# 	id = nsc_freebooter.18
+# 	title = "nsc_freebooter.14.name"
+# 	desc = "nsc_freebooter.13.desc"
+# 	diplomatic = yes
+# 	show_sound = event_space_battle
+# 	is_triggered_only = yes
+# 	picture_event_data = { portrait = ruler room = caravaneer_home_room planet_background = pc_barren_cold }
+# 	option = {
+# 		name = nsc_freebooter.7.end
+# 		add_modifier = { modifier = nsc_freebooter_market_cooldown_empire_modifier years = 1 }
+# 		event_target:nsc_freebooter_empire_fleet_market_target = {
+# 			add_opinion_modifier = { who = root modifier = nsc_freebooter_opinion_you_hit_me }
+# 		}
+# 	}
+# }
+# # 'trait_nsc_freebooter' trait change event 2
+# planet_event = {
+# 	id = nsc_freebooter.19
+# 	hide_window = yes
+# 	is_triggered_only = yes
+# 	trigger = { nsc_freebooter_trait_change_event_trigger_2 = yes }
+# 	immediate = { nsc_freebooter_trait_change_event_effect_2 = yes }
+# }
+# # 'trait_nsc_freebooter' trait change event 3
+# country_event = {
+# 	id = nsc_freebooter.20
+# 	hide_window = yes
+# 	is_triggered_only = yes
+# 	trigger = {
+# 		any_owned_planet = { nsc_freebooter_trait_change_event_trigger_2 = yes }
+# 	}
+# 	immediate = {
+# 		every_owned_planet = {
+# 			limit = { nsc_freebooter_trait_change_event_trigger_2 = yes }
+# 			nsc_freebooter_trait_change_event_effect_2 = yes
+# 		}
+# 	}
+# }
+# The condition check for the duel event # I could use the 'on_action' instead but nah I've changed my mind
+country_event = {
+	id = nsc_freebooter.21
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_country_flag = nsc_freebooter_the_duel_event_already_triggered }
+	}
+	immediate = {
+		if = {
+			limit = { # If the Khan is not dead yet
+				ruler = { has_trait = nsc_freebooter_leader_trait_ruler_great_khan }
+			}
+			if = {
+				limit = {
+					# And the player empire has at least one general
+					any_owned_leader = {
+						leader_class = commander
+						NOR = { has_trait = nsc_freebooter_admiral_trait_great_khan has_trait = nsc_freebooter_admiral_trait_child_of_great_khan }
+					}
+				}
+				set_country_flag = nsc_freebooter_the_duel_event_already_triggered
+				country_event = { id = nsc_freebooter.22 }
+			}
+			else = {
+				# Recheck the condition again
+				country_event = { id = nsc_freebooter.21 random = 180 days = 180 }
+			}
+		}
+		if = {
+			limit = {
+				ruler = {
+					NOT = { has_trait = nsc_freebooter_leader_trait_ruler_great_khan }
+				}
+			}
+			set_country_flag = nsc_freebooter_the_duel_event_already_triggered			# If the Khan is dead already
+		}
+	}
+}
+
+# The duel event starts
+country_event = {
+	id = nsc_freebooter.22
+	title = "nsc_freebooter.22.name"
+	desc = "nsc_freebooter.22.desc"
+	picture = GFX_evt_arena
+	picture_event_data = {
+		portrait = ruler
+		room = caravaneer_home_room
+		planet_background = pc_barren_cold
+	}
+	diplomatic = yes
+	show_sound = event_celebration
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	immediate = {
+		# NSC_FREEBOOTER_THE_DUEL_EVENT_START_SETUP_EFFECT
+		set_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 4 }		# Khan default hp
+		set_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 4 }		# Opponent default hp
+		ruler = {
+			switch = { trigger = has_trait
+				leader_trait_chosen = { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 } } }
+				leader_trait_cyborg = { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 } } }
+				leader_trait_psionic = { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 } } }
+				leader_trait_synthetic = { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 } } }
+			}
+		}
+		ordered_owned_leader = {
+			limit = {
+				leader_class = commander
+				NOR = {
+					is_event_leader = yes
+					has_trait = nsc_freebooter_admiral_trait_great_khan
+					has_trait = nsc_freebooter_admiral_trait_child_of_great_khan
+				}
+			}
+			position = 0
+			order_by = trigger:has_skill
+			switch = { trigger = has_trait
+				leader_trait_chosen		= { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 } } }
+				leader_trait_cyborg		= { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 } } }
+				leader_trait_psionic	= { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 } } }
+				leader_trait_synthetic	= { root = { change_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 } } }
+
+
+			}
+			save_event_target_as = nsc_freebooter_the_duel_evt_the_opponent_target
+		}
+		run_in_ai_mode = yes		# Without this immediate is not invoked when event runs in a special mode that allows AI to collect trade data
+	}
+	option = {
+		name = nsc_freebooter.22.a
+		custom_tooltip = nsc_freebooter.22.a.tooltip
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.26 }
+		}
+	}
+}
+
+# The fight ends
+# The Khan won
+country_event = {
+	id = nsc_freebooter.23
+	title = "nsc_freebooter.23.name"
+	desc = "nsc_freebooter.23.desc"
+	picture = GFX_evt_arena
+	show_sound = event_celebration
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	option = {
+		name = nsc_freebooter.23.a
+		custom_tooltip = nsc_freebooter.23.a.tooltip
+		add_modifier = { modifier = nsc_freebooter_the_duel_khan_won_empire_modifier years = 1 }
+		hidden_effect = {
+			event_target:nsc_freebooter_the_duel_evt_the_opponent_target = {
+				kill_leader = { show_notification = yes }
+			}
+		}
+	}
+}
+
+# The fight ends
+# The opponent won
+country_event = {
+	id = nsc_freebooter.24
+	title = "nsc_freebooter.24.name"
+	desc = "nsc_freebooter.24.desc"
+	picture = GFX_evt_arena
+	show_sound = event_celebration
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	after = {
+		hidden_effect = { create_khan_dummy = yes set_leader = event_target:nsc_freebooter_the_duel_evt_the_opponent_target }
+	}
+	option = {
+		name = nsc_freebooter.24.a
+		custom_tooltip = nsc_freebooter.24.a.tooltip
+		add_modifier = { modifier = nsc_freebooter_the_duel_opponent_won_empire_modifier years = 1 }
+		hidden_effect = {
+			set_country_flag = nsc_freebooter_khan_killed_in_action_flag
+			kill_leader = {
+				ruler = yes
+				heir = no
+				show_notification = yes
+			}
+			if = {
+				limit = { exists = heir }
+				kill_leader = { heir = yes show_notification = yes }
+			}
+			event_target:nsc_freebooter_the_duel_evt_the_opponent_target = {
+				add_skill = 1
+				add_trait = nsc_freebooter_leader_trait_ruler_great_khan
+				add_trait_no_notify = subclass_commander_councilor
+			}
+			assign_leader = event_target:nsc_freebooter_the_duel_evt_the_opponent_target
+		}
+	}
+}
+
+# The fight ends
+# Nobody won (both lost)
+country_event = {
+	id = nsc_freebooter.25
+	title = "nsc_freebooter.25.name"
+	desc = "nsc_freebooter.25.desc"
+	picture = GFX_evt_arena
+	show_sound = event_planetary_riot
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	option = {
+		name = nsc_freebooter.25.a
+		custom_tooltip = nsc_freebooter.25.a.tooltip		# Nobody dies
+		add_modifier = { modifier = nsc_freebooter_the_duel_both_lost_empire_modifier years = 1 }
+	}
+}
+
+# The fight begins
+# The round 1 action phase
+country_event = {
+	id = nsc_freebooter.26
+	title = "nsc_freebooter.26.name"
+	desc = "nsc_freebooter.26.desc"
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = no }
+		}
+		picture = GFX_evt_gladiators
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = yes }
+		}
+		picture = GFX_evt_psionic_battle
+	}
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	after = {
+		custom_tooltip = nsc_freebooter.26.tooltip
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.27 days = 1 }			# Go to the round 1 result phase
+			# NSC_FREEBOOTER_THE_DUEL_EVENT_ROUND_1_RESULT_EFFECT
+			switch = { trigger = has_country_flag
+				# aggressive
+				nsc_freebooter_the_duel_evt_option_aggressive_random_1 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_aggressive_random_2 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 2 }
+				}
+				nsc_freebooter_the_duel_evt_option_aggressive_random_3 = { }				# Nothing happens
+				nsc_freebooter_the_duel_evt_option_aggressive_random_4 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_aggressive_random_5 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 2 }
+				}
+				# defensive
+				nsc_freebooter_the_duel_evt_option_defensive_random_1 = {
+					change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_defensive_random_2 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_defensive_random_3 = { }				# Nothing happens
+				nsc_freebooter_the_duel_evt_option_defensive_random_4 = {
+					change_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_defensive_random_5 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+			}
+		}
+	}
+	option = {
+		name = nsc_freebooter.26.go.aggressive
+		hidden_effect = {
+			random_list = {
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_1 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_2 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_3 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_4 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_5 }
+			}
+		}
+	}
+	option = {
+		name = nsc_freebooter.26.go.defensive
+		hidden_effect = {
+			random_list = {
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_1 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_2 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_3 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_4 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_5 }
+			}
+		}
+	}
+}
+
+# The round 1 result phase
+country_event = {
+	id = nsc_freebooter.27
+	title = "nsc_freebooter.27.name"
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_1 }
+		text = "nsc_freebooter.27.agr.desc.1"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_2 }
+		text = "nsc_freebooter.31.desc.2"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_3 }
+		text = "nsc_freebooter.29.agr.desc.5"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_4 }
+		text = "nsc_freebooter.29.agr.desc.1"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_5 }
+		text = "nsc_freebooter.27.agr.desc.5"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_1 }
+		text = "nsc_freebooter.31.desc.5"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_2 }
+		text = "nsc_freebooter.29.def.desc.3"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_3 }
+		text = "nsc_freebooter.29.def.desc.4"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_4 }
+		text = "nsc_freebooter.27.def.desc.4"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_5 }
+		text = "nsc_freebooter.27.def.desc.5"
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = no }
+		}
+		picture = GFX_evt_gladiators
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = yes }
+		}
+		picture = GFX_evt_psionic_battle
+	}
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	after = {
+		hidden_effect = { nsc_freebooter_the_duel_event_result_reset_effect = yes }
+	}
+	option = {
+		name = nsc_freebooter.27.a
+		custom_tooltip = nsc_freebooter.27.a.tooltip
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.28 }
+		}
+		# Go to the round 2 action phase
+	}
+}
+
+# The round 2 action phase
+country_event = {
+	id = nsc_freebooter.28
+	title = "nsc_freebooter.28.name"
+	desc = {
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value > nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		text = "nsc_freebooter.28.desc.1"
+	}
+	desc = {
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value < nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		text = "nsc_freebooter.28.desc.2"
+	}
+	desc = {
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		text = "nsc_freebooter.28.desc.3"
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = no }
+		}
+		picture = GFX_evt_gladiators
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = yes }
+		}
+		picture = GFX_evt_psionic_battle
+	}
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	after = {
+		custom_tooltip = nsc_freebooter.26.tooltip
+		hidden_effect = {
+			# NSC_FREEBOOTER_THE_DUEL_EVENT_ROUND_2_RESULT_EFFECT
+			switch = { trigger = has_country_flag
+				# aggressive
+				nsc_freebooter_the_duel_evt_option_aggressive_random_1 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_aggressive_random_2 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 3 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 2 }
+				}
+				nsc_freebooter_the_duel_evt_option_aggressive_random_3 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 3 }
+				}
+				nsc_freebooter_the_duel_evt_option_aggressive_random_4 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 3 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 3 }
+				}
+				nsc_freebooter_the_duel_evt_option_aggressive_random_5 = { }				# Nothing happens
+				# defensive
+				nsc_freebooter_the_duel_evt_option_defensive_random_1 = {
+					change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_defensive_random_2 = {
+					change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_defensive_random_3 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+				}
+				nsc_freebooter_the_duel_evt_option_defensive_random_4 = { }				# Nothing happens
+				nsc_freebooter_the_duel_evt_option_defensive_random_5 = {
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 }
+					subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 2 }
+				}
+			}
+			country_event = { id = nsc_freebooter.29 }			# Go to the round 2 result phase
+		}
+	}
+	option = {
+		name = nsc_freebooter.26.go.aggressive
+		hidden_effect = {
+			random_list = {
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_1 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_2 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_3 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_4 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_5 }
+			}
+		}
+	}
+	option = {
+		name = nsc_freebooter.26.go.defensive
+		hidden_effect = {
+			random_list = {
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_1 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_2 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_3 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_4 }
+				20 = { set_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_5 }
+			}
+		}
+	}
+}
+
+# The round 2 result phase
+country_event = {
+	id = nsc_freebooter.29
+	title = "nsc_freebooter.29.name"
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_1 }
+		text = "nsc_freebooter.29.agr.desc.1"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_2 }
+		text = "nsc_freebooter.29.agr.desc.2"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_3 }
+		text = "nsc_freebooter.29.agr.desc.3"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_4 }
+		text = "nsc_freebooter.31.desc.2"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_5 }
+		text = "nsc_freebooter.29.agr.desc.5"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_1 }
+		text = "nsc_freebooter.29.def.desc.1"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_2 }
+		text = "nsc_freebooter.31.desc.4"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_3 }
+		text = "nsc_freebooter.29.def.desc.3"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_4 }
+		text = "nsc_freebooter.29.def.desc.4"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_the_duel_evt_option_defensive_random_5 }
+		text = "nsc_freebooter.29.def.desc.5"
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = no }
+		}
+		picture = GFX_evt_gladiators
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = yes }
+		}
+		picture = GFX_evt_psionic_battle
+	}
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	after = {
+		hidden_effect = { nsc_freebooter_the_duel_event_result_reset_effect = yes }
+	}
+	option = {
+		name = nsc_freebooter.27.a
+		custom_tooltip = nsc_freebooter.27.a.tooltip
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value >= 1 }
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value >= 1 }
+		}
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.30 }
+		}
+		# Go to the round 3 action phase
+	}
+	option = {
+		name = nsc_freebooter.27.b
+		custom_tooltip = nsc_freebooter.27.b.tooltip
+		trigger = {
+			OR = {
+				AND = {
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value <= 0 }
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value <= 0 }
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value > nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+				}
+				AND = {
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value >= 1 }
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value <= 0 }
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.23 }
+		}
+		# The Khan won
+	}
+	option = {
+		name = nsc_freebooter.27.c
+		custom_tooltip = nsc_freebooter.27.c.tooltip
+		trigger = {
+			OR = {
+				AND = {
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value <= 0 }
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value <= 0 }
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value < nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+				}
+				AND = {
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value <= 0 }
+					check_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value >= 1 }
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.24 }
+		}
+		# The opponent won
+	}
+	option = {
+		name = nsc_freebooter.27.d
+		custom_tooltip = nsc_freebooter.27.d.tooltip
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value <= 0 }
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value <= 0 }
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.25 }
+		}
+		# Nobody won (both lost)
+	}
+}
+
+# The round 3 action phase
+country_event = {
+	id = nsc_freebooter.30
+	title = "nsc_freebooter.30.name"
+	desc = {
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value > nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		text = "nsc_freebooter.28.desc.1"
+	}
+	desc = {
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value < nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		text = "nsc_freebooter.28.desc.2"
+	}
+	desc = {
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		text = "nsc_freebooter.28.desc.3"
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = no }
+		}
+		picture = GFX_evt_gladiators
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = yes }
+		}
+		picture = GFX_evt_psionic_battle
+	}
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+	after = {
+		custom_tooltip = nsc_freebooter.30.tooltip
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.31 }
+		}
+		# Go to the round 3 result phase
+	}
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	option = {
+		name = nsc_freebooter.30.agr.light
+		custom_tooltip = nsc_freebooter.30.agr.light.tooltip
+		hidden_effect = {
+			subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 }
+			subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 }
+			set_country_flag = nsc_freebooter_30_agr_light_flag
+		}
+	}
+	option = {
+		name = nsc_freebooter.30.agr.heavy
+		custom_tooltip = nsc_freebooter.30.agr.heavy.tooltip
+		hidden_effect = {
+			random_list = {
+				80 = { subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 } subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 2 } set_country_flag = nsc_freebooter_30_agr_heavy_flag }
+				20 = { subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 } subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 3 } set_country_flag = nsc_freebooter_30_agr_big_fortune_flag }
+			}
+		}
+	}
+	option = {
+		name = nsc_freebooter.30.def.light
+		custom_tooltip = nsc_freebooter.30.def.light.tooltip
+		hidden_effect = {
+			random_list = {
+				90 = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 } set_country_flag = nsc_freebooter_30_def_light_flag }
+				10 = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 1 } subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 } set_country_flag = nsc_freebooter_30_def_light_flag_alt }
+			}
+		}
+	}
+	option = {
+		name = nsc_freebooter.30.def.heavy
+		custom_tooltip = nsc_freebooter.30.def.heavy.tooltip
+		hidden_effect = {
+			random_list = {
+				25 = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 } set_country_flag = nsc_freebooter_30_def_heavy_flag }
+				50 = { change_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 } change_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 2 } set_country_flag = nsc_freebooter_30_def_heavy_flag_alt }
+				25 = { subtract_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 2 } subtract_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 1 } set_country_flag = nsc_freebooter_30_def_heavy_failed_flag }
+			}
+		}
+	}
+}
+
+# The round 3 result phase
+# To be honest, I think this event chain should be over at this phase
+# I don't think the players will like it, if it is long-drawn-out too much
+country_event = {
+	id = nsc_freebooter.31
+	title = "nsc_freebooter.31.name"
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_agr_light_flag }
+		text = "nsc_freebooter.31.desc.1"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_agr_heavy_flag }
+		text = "nsc_freebooter.31.desc.2"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_agr_big_fortune_flag }
+		text = "nsc_freebooter.31.desc.3"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_def_light_flag }
+		text = "nsc_freebooter.31.desc.4"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_def_light_flag_alt }
+		text = "nsc_freebooter.31.desc.5"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_def_heavy_flag }
+		text = "nsc_freebooter.31.desc.6"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_def_heavy_flag_alt }
+		text = "nsc_freebooter.31.desc.7"
+	}
+	desc = {
+		trigger = { has_country_flag = nsc_freebooter_30_def_heavy_failed_flag }
+		text = "nsc_freebooter.31.desc.8"
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = no }
+		}
+		picture = GFX_evt_gladiators
+	}
+	picture = {
+		trigger = {
+			ruler = { has_psionic_species_trait = yes }
+		}
+		picture = GFX_evt_psionic_battle
+	}
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+	auto_select = yes
+	force_open = yes
+	auto_opens = yes
+	# The Khan won
+	option = {
+		name = nsc_freebooter.27.b
+		custom_tooltip = nsc_freebooter.27.b.tooltip
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value > nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.23 }
+		}
+	}
+	# The opponent won
+	option = {
+		name = nsc_freebooter.27.c
+		custom_tooltip = nsc_freebooter.27.c.tooltip
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value < nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.24 }
+		}
+	}
+	# Nobody won (both lost)
+	option = {
+		name = nsc_freebooter.27.d
+		custom_tooltip = nsc_freebooter.27.d.tooltip
+		trigger = {
+			check_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = nsc_freebooter_the_duel_evt_the_opponent_hp_var }
+		}
+		hidden_effect = {
+			country_event = { id = nsc_freebooter.25 }
+		}
+	}
+}
+
+# When the Khan is dead somehow (on_leader_death)
+# Compare nsc_freebooter.5
+country_event = {
+	id = nsc_freebooter.32
+	title = "nsc_freebooter.6.name"
+	desc = {
+		exclusive_trigger = {
+			NOT = { has_modifier = humiliated }
+		}
+		text = nsc_freebooter.32.desc
+	}
+	# When the Khan die of old age
+	desc = {
+		exclusive_trigger = { has_modifier = humiliated }
+		text = nsc_freebooter.32.desc_alt
+	}
+	# Humiliated Khan suicided # Check 'fallen_empire_humiliate_effect' and 'fallen_empires.2' event
+	picture = GFX_evt_space_funeral
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	trigger = {
+		is_freebooter_empire = yes
+		NOT = { has_country_flag = nsc_freebooter_khan_killed_in_action_flag }
+		from = { has_trait = nsc_freebooter_leader_trait_ruler_great_khan }
+	}
+	immediate = {
+		if = {
+			# Kill the clone of the ruler
+			limit = {
+				any_owned_leader = {
+					leader_class = commander
+					OR = { has_trait = nsc_freebooter_admiral_trait_child_of_great_khan has_trait = nsc_freebooter_admiral_trait_great_khan }
+				}
+			}
+			random_owned_leader = {
+				limit = {
+					leader_class = commander
+					OR = { has_trait = nsc_freebooter_admiral_trait_child_of_great_khan has_trait = nsc_freebooter_admiral_trait_great_khan }
+				}
+				kill_leader = { show_notification = no }
+			}
+		}
+		else_if = {
+			# Kill the ruler if the clone died
+			limit = {
+				any_owned_leader = {
+					leader_class = official
+					OR = { has_trait = nsc_freebooter_leader_trait_ruler_child_of_great_khan has_trait = nsc_freebooter_leader_trait_ruler_great_khan }
+				}
+			}
+			random_owned_leader = {
+				limit = {
+					leader_class = official
+					OR = { has_trait = nsc_freebooter_leader_trait_ruler_child_of_great_khan has_trait = nsc_freebooter_leader_trait_ruler_great_khan }
+				}
+				kill_leader = { show_notification = no }
+			}
+		}
+	}
+	option = {
+		name = nsc_freebooter.6.a
+		add_modifier = { modifier = nsc_freebooter_death_of_khan_empire_modifier years = 1 }
+	}
+}
+
+# End War
+country_event = {
+	id = nsc_freebooter.33
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		is_at_war = yes
+		is_war_leader = yes
+		exists = from
+	}
+	immediate = {
+		# log = "From = \\[From.GetName], fromfrom = \\[fromfrom.GetName]"
+		random_war = {
+			limit = {
+				is_war_participant = { who = root side = attackers }
+				is_war_participant = { who = from side = defenders }
+				using_war_goal = { type = wg_nsc_freebooter_forced_border_open owner = root }
+			}
+			end_war_effect = yes
+			# Notification
+			root = {
+				create_message = {
+					type = "WAR_ENDED"
+					localization = "WAR_END_STATUS_QUO"					# MESSAGE_WAR_ENDED # WAR_END_STATUS_QUO
+					days = 30
+					target = from.capital_scope
+				}
+			}
+		}
+	}
+}
+
+# wg_nsc_freebooter_forced_border_open war goal effect event
+# From = target?
+# country_event = {
+# 	id = nsc_freebooter.33
+# 	hide_window = yes
+# 	is_triggered_only = yes
+# 	# trigger = {
+# 	# 	is_war_leader = yes
+# 	# 	from = {
+# 	# 		is_war_participant = { who = root side = attackers }
+# 	# 		using_war_goal = { type = wg_nsc_freebooter_forced_border_open owner = root }
+# 	# 	}
+# 	# }
+# 	immediate = {
+# 		log = "From = \\[From.GetName], fromfrom = \\[fromfrom.GetName]"
+# 		country_event = { id = nsc_freebooter.3300 days = 270 random = 180 scopes = { from = fromfrom } } # End War
+# 		fromfrom = {
+# 			# For 3 years # Check 'action.44' event too
+# 			set_closed_borders = { who = root status = no forced = 3 }
+# 			if = {
+# 				limit = { is_rival = root }
+# 				end_rivalry = root
+# 				add_modifier = { modifier = nsc_freebooter_forced_border_open_no_rival_empire_modifier years = 3 }					# For 3 years
+# 			}
+# 			set_policy = {
+# 				policy = diplomatic_stance
+# 				option = diplo_stance_belligerent					# 'diplo_stance_supremacist' is an enhanced version of this
+# 				cooldown = yes					# Default 10 years cooldown # Diplo action 'action_make_rival' requires 'diplo_stance_supremacist' policy
+# 				# So this will prevent the empire to set your empire as its rival for 10 years
+# 			}
+# 			root = {
+# 				# For 3 years # Check 'action.44' event too
+# 				set_closed_borders = { who = prev status = no forced = 3 }
+# 				add_resource = { influence = -5 mult = from.trigger:num_owned_planets }
+# 			}
+# 			# WG_NSC_FREEBOOTER_FORCED_BORDER_OPEN_COST_EFFECT
+# 			# if = {
+# 			# 	limit = { num_owned_planets > 0 num_owned_planets <= 5 }
+# 			# 	root = { add_resource = { influence = -25 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 5 num_owned_planets <= 10 }
+# 			# 	root = { add_resource = { influence = -50 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 10 num_owned_planets <= 15 }
+# 			# 	root = { add_resource = { influence = -75 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 15 num_owned_planets <= 20 }
+# 			# 	root = { add_resource = { influence = -100 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 20 num_owned_planets <= 25 }
+# 			# 	root = { add_resource = { influence = -125 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 25 num_owned_planets <= 30 }
+# 			# 	root = { add_resource = { influence = -150 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 30 num_owned_planets <= 35 }
+# 			# 	root = { add_resource = { influence = -175 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 35 num_owned_planets <= 40 }
+# 			# 	root = { add_resource = { influence = -200 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 40 num_owned_planets <= 45 }
+# 			# 	root = { add_resource = { influence = -225 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 45 num_owned_planets <= 50 }
+# 			# 	root = { add_resource = { influence = -250 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 50 num_owned_planets <= 55 }
+# 			# 	root = { add_resource = { influence = -275 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 55 num_owned_planets <= 60 }
+# 			# 	root = { add_resource = { influence = -300 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 60 num_owned_planets <= 65 }
+# 			# 	root = { add_resource = { influence = -325 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 65 num_owned_planets <= 70 }
+# 			# 	root = { add_resource = { influence = -350 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 70 num_owned_planets <= 75 }
+# 			# 	root = { add_resource = { influence = -375 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 75 num_owned_planets <= 80 }
+# 			# 	root = { add_resource = { influence = -400 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 80 num_owned_planets <= 85 }
+# 			# 	root = { add_resource = { influence = -425 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 85 num_owned_planets <= 90 }
+# 			# 	root = { add_resource = { influence = -450 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 90 num_owned_planets <= 95 }
+# 			# 	root = { add_resource = { influence = -475 } }
+# 			# }
+# 			# else_if = {
+# 			# 	limit = { num_owned_planets > 95 }
+# 			# 	root = { add_resource = { influence = -500 } }
+# 			# }
+# 		}
+# 	}
+# }
+# 'Pirate Raid' only one
+# 'on_monthly_pulse' on_action event
+event = {
+	id = nsc_freebooter.34
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		any_playable_country = { is_freebooter_empire = yes }
+	}
+	immediate = {
+		# Just once?
+		random_playable_country = {
+			limit = {
+				is_freebooter_empire = yes
+				has_ascension_perk = ap_nsc_freebooter_pirate_raider
+				has_edict = nsc_freebooter_pirate_raiding_control
+			}
+			country_event = { id = nsc_freebooter.3400 days = 3 }
+		}
+	}
+}
+
+# 'Pirate Raid' effect events
+# 'on_monthly_pulse_country' on_action event
+country_event = {
+	id = nsc_freebooter.3400
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		# merg_is_default_empire = yes
+		is_freebooter_empire = yes
+		has_ascension_perk = ap_nsc_freebooter_pirate_raider
+		has_edict = nsc_freebooter_pirate_raiding_control
+		any_controlled_fleet = {
+			is_mobile = yes
+			is_civilian = no
+			exists = orbit
+			orbit = {
+				is_colony = yes
+				NOR = {
+					is_owned_by = root
+					has_planet_flag = nsc_freebooter_planet_raiding_prevent_duplication
+					has_modifier = nsc_freebooter_recently_raided_world_planet_modifier
+					# No effect on crisis faction's planets
+					is_planet_class = pc_infested
+					is_planet_class = pc_ai
+				}
+			}
+			# OR = {
+			# 	is_ship_class = shipclass_military
+			# 	is_ship_class = shipclass_military_special				# For colossus # I may removed this later
+			# 	is_ship_class = shipclass_starbase				# For juggernaut # I may removed this later
+			# }
+		}
+	}
+	immediate = {
+		random_controlled_fleet = {
+			# Changed from 'every_fleet_in_system' to prevent the event to happen several times at once
+			limit = {
+				is_mobile = yes
+				is_civilian = no
+				exists = orbit
+				orbit = {
+					# is_scope_type = planet
+					has_owner = yes
+					is_colony = yes
+					NOR = {
+						is_owned_by = root
+						has_planet_flag = nsc_freebooter_planet_raiding_prevent_duplication
+						has_modifier = nsc_freebooter_recently_raided_world_planet_modifier
+						# No effect on crisis faction's planets
+						is_planet_class = pc_infested
+						is_planet_class = pc_ai
+					}
+				}
+				# OR = {
+				# 	is_ship_class = shipclass_military
+				# 	is_ship_class = shipclass_military_special					# For colossus # I may removed this later
+				# 	is_ship_class = shipclass_starbase					# For juggernaut # I may removed this later
+				# }
+			}
+			orbit = {
+				planet_event = { id = nsc_freebooter.35 }
+			}
+		}
+	}
+}
+
+# The real 'Pirate Raid' effect events
+# From = fleet owner = freebooter
+planet_event = {
+	id = nsc_freebooter.35
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		set_timed_planet_flag = { flag = nsc_freebooter_planet_raiding_prevent_duplication months = 1 }		# It takes exactly 30 days to pass a month
+		add_planet_devastation = 5
+		# NSC_FREEBOOTER_PLANET_RAIDING_PLANETARY_EFFECT
+		switch = { trigger = has_modifier
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_1 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_1
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_2 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_2 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_2
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_3 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_3 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_3
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_4 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_4 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_4
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_5 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_5 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_5
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_6 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_6 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_6
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_7 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_7 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_7
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_8 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_8 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_8
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_9 years = 3 }
+			}
+			nsc_freebooter_world_currently_under_raiding_planet_modifier_9 = {
+				remove_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_9
+				add_modifier = { modifier = nsc_freebooter_recently_raided_world_planet_modifier years = 3 }
+			}
+			nsc_freebooter_recently_raided_world_planet_modifier = { }
+			default = {
+				add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_1 years = 3 }
+			}
+		}
+		# The sequence (of these effects) matters
+		# if = {
+		# 	limit = {
+		# 		NOR = {
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_1
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_2
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_3
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_4
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_5
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_6
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_7
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_8
+		# 			has_modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_9
+		# 			has_modifier = nsc_freebooter_recently_raided_world_planet_modifier
+		# 		}
+		# 	}
+		# 	add_modifier = { modifier = nsc_freebooter_world_currently_under_raiding_planet_modifier_1 years = 3 }
+		# }
+		# solar_system = {
+		# 	random_fleet_in_system = { # Changed from 'every_fleet_in_system' to prevent the event to happen several times at once
+		# 		limit = {
+		# 			exists = orbit
+		# 			orbit = { is_planet = root }
+		# 			owner = { has_ascension_perk = ap_nsc_freebooter_pirate_raider }
+		# 		}
+		from = {
+			# The owner empire (the freebooter empire) of the fleet, which is located in the orbit of the 'root' (the planet where is raided by the empire)
+			add_intel = { who = root.owner amount = 1 }
+			root = {
+				owner = {
+					# The owner empire of the 'root' (the planet where is raided by the freebooter empire)
+					add_opinion_modifier = {
+						who = prevprev						# Two steps back from the 'owner' so it's the freebooter empire
+						modifier = nsc_freebooter_opinion_they_raided_one_of_our_colony
+					}
+				}
+				if = {
+					limit = { prev = { is_at_war_with = root.owner } }
+					random_owned_pop = {
+						# Abduct a pop # a 'random_owned_pop' who is living in the 'root' (the planet where is raided by the empire)
+						prevprev = {
+							# The freebooter empire
+							random_owned_planet = {
+								# Two steps back from the 'random_owned_planet' (one of the freebooter empire's planet) so it's 'random_owned_pop'
+								limit = { free_jobs >= 1 }
+								create_pop = { species = prevprev }
+							}
+							if = {
+								# If every planet under the freebooter empire has NO free job available at this moment
+								limit = {
+									count_owned_planet = {
+										limit = { free_jobs >= 1 }
+										count = 0
+									}
+								}
+								capital_scope = {
+									# Two steps back from the 'capital_scope' (the freebooter empire's capital) so it's 'random_owned_pop'
+									create_pop = { species = prevprev }
+								}
+							}
+						}
+						kill_pop = yes
+					}
+				}
+			}
+			if = {
+				limit = { NOR = { has_technology = tech_nsc_freebooter_planet_raiding_improve_1 has_technology = tech_nsc_freebooter_planet_raiding_improve_2 } }
+				# NSC_FREEBOOTER_PLANET_RAIDING_EFFECT_1
+				if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_generator
+								colony_type = col_habitat_energy
+								colony_type = col_generator
+							}
+						}
+					}
+					add_resource = { energy = 50 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE							# The notification message for a freebooter empire
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ENERGIES
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE								# The notification message for a freebooter empire # Alternative ver
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ENERGIES_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_mining colony_type = col_habitat_mining }
+						}
+					}
+					add_resource = { minerals = 50 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_MINERALS
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_MINERALS_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_farming colony_type = col_ring_farming }
+						}
+					}
+					add_resource = { food = 50 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_FOOD
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_FOOD_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_foundry
+								colony_type = col_habitat_foundry
+								colony_type = col_ecu_foundry
+								colony_type = col_hiv_foundry
+								colony_type = col_mac_foundry
+							}
+						}
+					}
+					add_resource = { alloys = 50 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ALLOYS
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ALLOYS_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_factory
+								colony_type = col_habitat_factory
+								colony_type = col_ecu_factory
+								colony_type = col_mac_factory
+							}
+						}
+					}
+					add_resource = { consumer_goods = 50 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_GOODS
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_GOODS_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_research
+								colony_type = col_ecu_research
+								colony_type = col_ring_research
+								colony_type = col_habitat_research
+							}
+						}
+					}
+					add_resource = { physics_research = 50 society_research = 50 engineering_research = 50 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RESEARCH
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RESEARCH_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_refinery colony_type = col_habitat_refinery }
+						}
+					}
+					add_resource = { exotic_gases = 50 rare_crystals = 50 volatile_motes = 50 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RARES
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RARES_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_capital
+								colony_type = col_capital_hive
+								colony_type = col_capital_machine
+								colony_type = col_capital_nsc_freebooter
+								colony_type = col_fe_capital
+							}
+						}
+					}
+					add_resource = { alloys = 50 consumer_goods = 50 influence = 10 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_CAPITAL
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_CAPITAL_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							NOR = {
+								colony_type = col_generator
+								colony_type = col_habitat_energy
+								colony_type = col_generator
+								colony_type = col_mining
+								colony_type = col_habitat_mining
+								colony_type = col_farming
+								colony_type = col_ring_farming
+								colony_type = col_foundry
+								colony_type = col_habitat_foundry
+								colony_type = col_ecu_foundry
+								colony_type = col_hiv_foundry
+								colony_type = col_mac_foundry
+								colony_type = col_factory
+								colony_type = col_habitat_factory
+								colony_type = col_ecu_factory
+								colony_type = col_mac_factory
+								colony_type = col_research
+								colony_type = col_ecu_research
+								colony_type = col_ring_research
+								colony_type = col_habitat_research
+								colony_type = col_refinery
+								colony_type = col_habitat_refinery
+								colony_type = col_capital
+								colony_type = col_capital_hive
+								colony_type = col_capital_machine
+								colony_type = col_capital_nsc_freebooter
+								colony_type = col_fe_capital
+							}
+						}
+					}
+					add_resource = { energy = 20 minerals = 20 food = 10 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ETC
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ETC_ALT
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_technology = tech_nsc_freebooter_planet_raiding_improve_1
+					NOT = { has_technology = tech_nsc_freebooter_planet_raiding_improve_2 }
+				}
+				# When the empire only has 'tech_nsc_freebooter_planet_raiding_improve_1' tech
+				# NSC_FREEBOOTER_PLANET_RAIDING_EFFECT_2
+				if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_generator
+								colony_type = col_habitat_energy
+								colony_type = col_generator
+							}
+						}
+					}
+					add_resource = { energy = 80 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ENERGIES_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ENERGIES_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_mining colony_type = col_habitat_mining }
+						}
+					}
+					add_resource = { minerals = 80 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_MINERALS_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_MINERALS_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_farming colony_type = col_ring_farming }
+						}
+					}
+					add_resource = { food = 80 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_FOOD_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_FOOD_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_foundry
+								colony_type = col_habitat_foundry
+								colony_type = col_ecu_foundry
+								colony_type = col_hiv_foundry
+								colony_type = col_mac_foundry
+							}
+						}
+					}
+					add_resource = { alloys = 80 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ALLOYS_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ALLOYS_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_factory
+								colony_type = col_habitat_factory
+								colony_type = col_ecu_factory
+								colony_type = col_mac_factory
+							}
+						}
+					}
+					add_resource = { consumer_goods = 80 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_GOODS_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_GOODS_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_research
+								colony_type = col_ecu_research
+								colony_type = col_ring_research
+								colony_type = col_habitat_research
+							}
+						}
+					}
+					add_resource = { physics_research = 80 society_research = 80 engineering_research = 80 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RESEARCH_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RESEARCH_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_refinery colony_type = col_habitat_refinery }
+						}
+					}
+					add_resource = { exotic_gases = 80 rare_crystals = 80 volatile_motes = 80 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RARES_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RARES_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_capital
+								colony_type = col_capital_hive
+								colony_type = col_capital_machine
+								colony_type = col_capital_nsc_freebooter
+								colony_type = col_fe_capital
+							}
+						}
+					}
+					add_resource = { alloys = 80 consumer_goods = 80 influence = 20 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_CAPITAL_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_CAPITAL_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							NOR = {
+								colony_type = col_generator
+								colony_type = col_habitat_energy
+								colony_type = col_generator
+								colony_type = col_mining
+								colony_type = col_habitat_mining
+								colony_type = col_farming
+								colony_type = col_ring_farming
+								colony_type = col_foundry
+								colony_type = col_habitat_foundry
+								colony_type = col_ecu_foundry
+								colony_type = col_hiv_foundry
+								colony_type = col_mac_foundry
+								colony_type = col_factory
+								colony_type = col_habitat_factory
+								colony_type = col_ecu_factory
+								colony_type = col_mac_factory
+								colony_type = col_research
+								colony_type = col_ecu_research
+								colony_type = col_ring_research
+								colony_type = col_habitat_research
+								colony_type = col_refinery
+								colony_type = col_habitat_refinery
+								colony_type = col_capital
+								colony_type = col_capital_hive
+								colony_type = col_capital_machine
+								colony_type = col_capital_nsc_freebooter
+								colony_type = col_fe_capital
+							}
+						}
+					}
+					add_resource = { energy = 35 minerals = 35 food = 10 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ETC_2
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ETC_ALT_2
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = { has_technology = tech_nsc_freebooter_planet_raiding_improve_1 has_technology = tech_nsc_freebooter_planet_raiding_improve_2 }
+				# When the empire has 'tech_nsc_freebooter_planet_raiding_improve_2' tech too
+				# NSC_FREEBOOTER_PLANET_RAIDING_EFFECT_3
+				if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_generator
+								colony_type = col_habitat_energy
+								colony_type = col_generator
+							}
+						}
+					}
+					add_resource = { energy = 100 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ENERGIES_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ENERGIES_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_mining colony_type = col_habitat_mining }
+						}
+					}
+					add_resource = { minerals = 100 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_MINERALS_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_MINERALS_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_farming colony_type = col_ring_farming }
+						}
+					}
+					add_resource = { food = 100 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_FOOD_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_FOOD_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_foundry
+								colony_type = col_habitat_foundry
+								colony_type = col_ecu_foundry
+								colony_type = col_hiv_foundry
+								colony_type = col_mac_foundry
+							}
+						}
+					}
+					add_resource = { alloys = 100 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ALLOYS_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ALLOYS_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_factory
+								colony_type = col_habitat_factory
+								colony_type = col_ecu_factory
+								colony_type = col_mac_factory
+							}
+						}
+					}
+					add_resource = { consumer_goods = 100 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_GOODS_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_GOODS_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_research
+								colony_type = col_ecu_research
+								colony_type = col_ring_research
+								colony_type = col_habitat_research
+							}
+						}
+					}
+					add_resource = { physics_research = 100 society_research = 100 engineering_research = 100 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RESEARCH_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RESEARCH_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = { colony_type = col_refinery colony_type = col_habitat_refinery }
+						}
+					}
+					add_resource = { exotic_gases = 100 rare_crystals = 100 volatile_motes = 100 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RARES_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_RARES_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							OR = {
+								colony_type = col_capital
+								colony_type = col_capital_hive
+								colony_type = col_capital_machine
+								colony_type = col_capital_nsc_freebooter
+								colony_type = col_fe_capital
+							}
+						}
+					}
+					add_resource = { alloys = 100 consumer_goods = 100 influence = 30 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_CAPITAL_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_CAPITAL_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						root = {
+							NOR = {
+								colony_type = col_generator
+								colony_type = col_habitat_energy
+								colony_type = col_generator
+								colony_type = col_mining
+								colony_type = col_habitat_mining
+								colony_type = col_farming
+								colony_type = col_ring_farming
+								colony_type = col_foundry
+								colony_type = col_habitat_foundry
+								colony_type = col_ecu_foundry
+								colony_type = col_hiv_foundry
+								colony_type = col_mac_foundry
+								colony_type = col_factory
+								colony_type = col_habitat_factory
+								colony_type = col_ecu_factory
+								colony_type = col_mac_factory
+								colony_type = col_research
+								colony_type = col_ecu_research
+								colony_type = col_ring_research
+								colony_type = col_habitat_research
+								colony_type = col_refinery
+								colony_type = col_habitat_refinery
+								colony_type = col_capital
+								colony_type = col_capital_hive
+								colony_type = col_capital_machine
+								colony_type = col_capital_nsc_freebooter
+								colony_type = col_fe_capital
+							}
+						}
+					}
+					add_resource = { energy = 45 minerals = 45 food = 10 }
+					if = {
+						limit = { NOT = { is_at_war_with = root.owner } }
+						create_message = {
+							type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+							localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ETC_3
+							days = 15
+							target = root
+							variable = {
+								type = name
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+								scope = root
+							}
+						}
+						else = {
+							create_message = {
+								type = NSC_FREEBOOTERS_PIRATE_RAID_MESSAGE_TYPE
+								localization = NSC_FREEBOOTER_PIRATE_RAIDING_DONE_ETC_ALT_3
+								days = 15
+								target = root
+								variable = {
+									type = name
+									localization = NSC_FREEBOOTER_PIRATE_RAIDING_TARGET_PLANET
+									scope = root
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# 'nsc_freebooter_boarding_pod' ship component effect event (on_ship_destroyed_perp)
+# This = owner of ship 1 (combatant)
+# From = owner of ship 2 (destroyed)
+# fromfrom = ship 1
+# fromfromfrom = ship 2
+country_event = {
+	id = nsc_freebooter.36
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		merg_is_default_empire = yes
+		fromfrom = {
+			OR = { has_component = NSC_FREEBOOTER_BOARDING_POD_1 has_component = NSC_FREEBOOTER_BOARDING_POD_2 }
+		}
+		exists = fromfromfrom
+		fromfromfrom = {
+			# OR = {
+			is_ship_class = shipclass_military			# Should be always mobile
+			# 	fleet = {
+			# 		fleet_size < 2
+			# 		OR = {
+			# 			is_ship_class = shipclass_starbase
+			# 			is_ship_class = shipclass_military_special
+			# 		}
+			# 		is_mobile = yes
+			# 		# is_civilian = no
+			# 		# NOT = { is_ship_class = shipclass_transport }
+			# 	}
+			# }
+			# OR = {
+			# 	is_ship_size = corvette
+			# 	is_ship_size = destroyer
+			# 	is_ship_size = cruiser
+			# 	is_ship_size = battleship
+			# 	is_ship_size = titan
+			# 	is_ship_size = juggernaut	# class = shipclass_starbase
+			# 	is_ship_size = colossus		# class = shipclass_military_special
+			# 	is_ship_size = small_ship_fallen_empire
+			# 	is_ship_size = large_ship_fallen_empire
+			# 	is_ship_size = massive_ship_fallen_empire
+			# 	# NSC ship classes
+			# 	is_ship_size = StrikeCruiser
+			# 	is_ship_size = escortcarrier
+			# 	is_ship_size = Battlecruiser
+			# 	is_ship_size = Carrier
+			# 	is_ship_size = Dreadnought
+			# 	is_ship_size = Flagship
+			# }
+		}
+		from = {
+			OR = { is_regular_empire = yes is_pirate_country = yes }
+		}
+	}
+	immediate = {
+		fromfromfrom = { save_event_target_as = nsc_freebooter_ship_target }
+		# NSC_FREEBOOTER_BOARDING_POD_MAIN_EFFECT
+		random_list = {
+			85 = { }
+			15 = {
+				modifier = { factor = 1.9 fromfrom = { has_component = NSC_FREEBOOTER_BOARDING_POD_2 } }				# (15*1.89)/((15*1.89)+85) = 25%
+				create_fleet = {
+					name = event_target:nsc_freebooter_ship_target
+					settings = {
+						can_upgrade = no
+						can_change_composition = no
+						can_change_leader = no
+						uses_naval_capacity = no
+						spawn_debris = no
+						can_disband = no
+					}
+					effect = {
+						set_owner = from
+						create_ship = {
+							name = event_target:nsc_freebooter_ship_target
+							design = event_target:nsc_freebooter_ship_target
+							graphical_culture = from
+							effect = {
+								set_disabled = yes
+								reduce_hp_percent = 99
+								# save_event_target_as = nsc_freebooter_ship_new_target
+								set_ship_flag = nsc_freebooter_ship_target
+								enable_special_project = {
+									name = NSC_FREEBOOTER_BOARDED_SHIP_REPAIR_PROJECT
+									owner = root
+									location = this
+								}								# Location needs to be exact this
+							}
+						}
+						set_location = { target = event_target:nsc_freebooter_ship_target }
+						set_event_locked = yes
+						set_controller = event_target:global_event_country
+						set_fleet_stance = passive
+					}
+				}
+				last_created_fleet = {
+					set_owner = root
+					# enable_special_project = { name = NSC_FREEBOOTER_BOARDED_SHIP_REPAIR_PROJECT owner = root location = event_target:nsc_freebooter_ship_new_target } # Location needs to be exact this fleet
+				}
+			}
+		}
+	}
+}
+
+# HELPER 'NSC_FREEBOOTER_BOARDED_SHIP_REPAIR_PROJECT' special project effect event
+# fromfrom = fleet
+ship_event = {
+	id = nsc_freebooter.37
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		# log = "From=\\[From.GetName]; fromfrom=\\[fromfrom.GetName]"
+		if = {
+			limit = {
+				exists = from
+				from = {
+					is_scope_type = fleet
+					any_controlled_ship = {
+						is_ship_class = shipclass_military
+						is_disabled = yes
+						has_ship_flag = nsc_freebooter_ship_target
+					}
+				}
+			}
+			from = { save_event_target_as = nsc_freebooter_fleet_target }
+		}
+		else_if = {
+			limit = {
+				exists = from
+				from = {
+					is_scope_type = ship
+					is_disabled = yes
+					has_ship_flag = nsc_freebooter_ship_target
+				}
+			}
+			from.fleet = { save_event_target_as = nsc_freebooter_fleet_target }
+		}
+		else_if = {
+			limit = {
+				exists = fromfrom
+				fromfrom = {
+					is_scope_type = fleet
+					any_controlled_ship = {
+						is_ship_class = shipclass_military
+						is_disabled = yes
+						has_ship_flag = nsc_freebooter_ship_target
+					}
+				}
+			}
+			fromfrom = { save_event_target_as = nsc_freebooter_fleet_target }
+		}
+		else = {
+			solar_system = {
+				random_fleet_in_system = {
+					limit = {
+						exists = owner
+						is_owned_by = root.owner
+						is_mobile = yes
+						any_controlled_ship = {
+							is_ship_class = shipclass_military
+							is_disabled = yes
+							has_ship_flag = nsc_freebooter_ship_target
+						}
+					}
+					save_event_target_as = nsc_freebooter_fleet_target
+				}
+			}
+		}
+		if = {
+			limit = { exists = event_target:nsc_freebooter_fleet_target }
+			event_target:nsc_freebooter_fleet_target = {
+				set_fleet_settings = {
+					can_upgrade = yes
+					can_change_composition = yes
+					can_change_leader = yes
+					uses_naval_capacity = yes
+					spawn_debris = yes
+					can_disband = yes
+				}
+				set_controller = root.owner
+				set_owner = root.owner
+				every_controlled_ship = {
+					limit = { is_disabled = yes }
+					remove_ship_flag = nsc_freebooter_ship_target
+					set_disabled = no
+				}
+				set_event_locked = no
+			}
+		}
+	}
+}
+
+# (on_fail special project) HELPER 'NSC_FREEBOOTER_BOARDED_SHIP_REPAIR_PROJECT'
+# from = project scope (matches setting in "event_scope" i.e. ship/planet/country). Might not exist!
+# fromfrom = location scope, if set (usually a planet)
+country_event = {
+	id = nsc_freebooter.3701
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		# log = "BOARDING Project Fail: This = \\[This.GetName] From = \\[From.GetName], fromfrom = \\[fromfrom.GetName]"
+		if = {
+			limit = {
+				exists = fromfrom
+				fromfrom = { is_scope_type = ship is_disabled = yes }
+			}
+			if = {
+				limit = {
+					OR = {
+						NOT = { exists = fromfrom.solar_system }
+						fromfrom.solar_system = { is_owned_by = prev }
+					}
+				}
+				destroy_ship = fromfrom
+			}
+			else = {
+				fromfrom.fleet = { save_event_target_as = nsc_freebooter_fleet_target }
+			}
+		}
+		else_if = {
+			limit = {
+				exists = fromfrom
+				fromfrom = {
+					is_scope_type = fleet
+					any_controlled_ship = { is_ship_class = shipclass_military is_disabled = yes }
+				}
+			}
+			fromfrom = { save_event_target_as = nsc_freebooter_fleet_target }
+		}
+		else = { break = yes }
+		if = {
+			limit = { exists = event_target:nsc_freebooter_fleet_target }
+			event_target:nsc_freebooter_fleet_target = {
+				if = {
+					limit = { exists = solar_system }
+					if = {
+						limit = {
+							solar_system = { has_owner = no }
+							NOT = { is_owned_by = prev }
+						}
+						set_controller = owner
+					}
+					else_if = {
+						limit = {
+							solar_system = { has_owner = yes }
+							is_owned_by = prev
+						}
+						set_controller = solar_system.owner
+						set_owner = solar_system.owner
+					}
+					else = { set_controller = owner }
+					every_controlled_ship = {
+						limit = { is_disabled = yes }
+						remove_ship_flag = nsc_freebooter_ship_target
+						set_disabled = no
+					}
+					set_event_locked = no
+					set_fleet_stance = passive
+					if = {
+						limit = { can_go_mia = yes }
+						set_mia = mia_emergency_ftl
+					}
+				}
+				else = { destroy_fleet = this }
+			}
+		}
+	}
+}
+
+# If a new ruler is created after the Khan is dead (on_ruler_set)
+# Compare nsc_freebooter.5
+country_event = {
+	id = nsc_freebooter.38
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		is_freebooter_empire = yes
+		has_ascension_perk = ap_nsc_freebooter_wrath_of_khan
+		ruler = {
+			NOR = { has_trait = nsc_freebooter_leader_trait_ruler_great_khan has_trait = nsc_freebooter_leader_trait_ruler_child_of_great_khan }
+		}
+	}
+	immediate = {
+		ruler = { add_trait = nsc_freebooter_leader_trait_ruler_child_of_great_khan assign_gestalt_ruler_subclass_trait = yes }
+	}
+	after = {
+		hidden_effect = { create_khan_dummy = yes }
+	}
+}
+
+# 'NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT' special project effect event
+country_event = {
+	id = nsc_freebooter.39
+	title = "nsc_freebooter.39.name"
+	desc = "nsc_freebooter.39.desc"
+	picture = GFX_evt_fleet_from_surface
+	show_sound = relic_activation_khans_throne
+	location = root.capital_scope
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			# TODO this is just a cheap fallback, needs proper event message for new ruler
+			limit = { NOT = { exists = root.ruler } }
+			random_owned_leader = {
+				limit = {
+					OR = {
+						has_trait = nsc_freebooter_leader_trait_ruler_great_khan
+						has_trait = nsc_freebooter_leader_trait_ruler_child_of_great_khan
+						has_trait = nsc_freebooter_admiral_trait_great_khan
+						has_trait = nsc_freebooter_admiral_trait_child_of_great_khan
+					}
+				}
+				weights = { base = 1
+					modifier = { factor = 50 leader_class = official }
+				}
+				prev = { assign_leader = prev }
+			}
+		}
+		if = {
+			# TODO this is just a cheap fallback, needs proper event message for new ruler
+			limit = { NOT = { exists = root.ruler } }
+			random_owned_leader = {
+				limit = { leader_class = official }
+				prev = { assign_leader = prev }
+			}
+		}
+		# else # TODO what if no ruler found?
+		if = {
+			limit = {
+				ruler = {
+					NOR = { has_trait = nsc_freebooter_leader_trait_ruler_great_khan has_trait = nsc_freebooter_leader_trait_ruler_child_of_great_khan }
+				}
+			}
+			ruler = { add_trait = nsc_freebooter_leader_trait_ruler_great_khan add_trait_no_notify = subclass_commander_councilor }
+		}
+		random_owned_leader = {
+			limit = {
+				leader_class = commander
+				OR = { has_trait = nsc_freebooter_admiral_trait_great_khan has_trait = nsc_freebooter_admiral_trait_child_of_great_khan }
+			}
+			save_event_target_as = nsc_freebooter_khan_flagship_admiral
+		}
+		create_fleet = {
+			effect = {
+				set_owner = root
+				set_location = root.capital_scope
+				create_ship = {
+					prefix = no
+					name = "nsc_freebooter_flagship"
+					design = "NSC_Freebooters_Flagship_Vengeance"
+					graphical_culture = "nsc_freebooter_01"
+					effect = { set_disable_at_health = 0.01 }
+				}
+				set_leader = nsc_freebooter_khan_flagship_admiral
+			}
+			settings = {
+				spawn_debris = no
+				# can_upgrade = no
+				can_change_composition = no
+				uses_naval_capacity = no
+			}
+		}
+		set_country_flag = nsc_freebooter_khan_flagship_owner
+	}
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					last_created_fleet = {
+						NOT = { exists = leader }
+					}
+				}
+				if = {
+					limit = { NOT = { exists = event_target:nsc_freebooter_khan_flagship_admiral } }
+					# Fallback clone!?
+					create_khan_dummy = yes
+				}
+			}
+			give_tech_no_error_effect = { MESSAGE = yes TECH = tech_autocannons_1 }
+			if = {
+				limit = { NOR = { has_technology = tech_autocannons_2 has_tech_option = tech_autocannons_2 } }
+				add_research_option = tech_autocannons_2
+			}
+			# change_country_flag = {
+			# 	icon = { category = "marauder" file = "flag_marauder_1.dds" }
+			# 	background = { category = "backgrounds" file = "00_solid.dds" }
+			# 	colors = { "red" "red" "null" "null" }
+			# }
+			if = {
+				limit = { NOT = { has_origin = origin_khan_successor } }
+				create_ship_design = { design = "NAME_Pirate_Transport" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_Clan_Builder" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_Outrider" }
+				add_ship_design = last_created_design
+				randomize_flag_symbol = "marauder"
+				set_country_flag = new_khanate_flag
+				# TODO CIVIL WAR Event
+				set_origin = origin_khan_successor
+				force_add_civic = civic_diadochi
+				force_add_civic = civic_great_khans_legacy
+			}
+		}
+	}
+	option = { name = nsc_freebooter.39.a }
+}
+
+# When the Khan's flagship is (nearly) destroyed in a battle
+ship_event = {
+	id = nsc_freebooter.40
+	title = "nsc_freebooter.40.name"
+	desc = "nsc_freebooter.40.desc"
+	picture = GFX_evt_small_space_battle
+	show_sound = event_space_battle
+	location = this
+	is_triggered_only = yes
+	trigger = {
+		is_ship_size = nsc_freebooter_flagship
+		is_disabled = yes
+		owner = {
+			NOR = {
+				has_active_event = { nsc_freebooter.40 }
+				has_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened
+			}
+		}
+	}
+	immediate = {
+		fleet = { set_event_locked = yes }
+	}
+	# after = {
+	# 	fleet = { set_event_locked = no }
+	# }
+	option = {
+		name = nsc_freebooter.40.a
+		custom_tooltip = nsc_freebooter.40.a.tooltip
+		allow = {
+			owner = {
+				has_resource = { type = energy amount > 1000 }
+				has_resource = { type = alloys amount > 6000 }
+				has_resource = { type = volatile_motes amount > 150 }
+				has_resource = { type = exotic_gases amount > 150 }
+				has_resource = { type = rare_crystals amount > 150 }
+			}
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened
+				add_resource = {
+					energy = -1000
+					alloys = -6000
+					volatile_motes = -150
+					exotic_gases = -150
+					rare_crystals = -150
+				}
+			}
+			enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_REPAIR_PROJECT" location = this owner = owner }
+		}
+		ai_chance = { base = 10 }
+	}
+	# option = {
+	# 	name = nsc_freebooter.40.b
+	# 	custom_tooltip = nsc_freebooter.40.b.tooltip
+	# 	fleet = {
+	# 		every_owned_ship = {
+	# 			limit = { is_disabled = no }
+	# 			destroy_ship = this
+	# 		}
+	# 	}
+	# 	ai_chance = { base = 1 }
+	# }
+	option = {
+		name = nsc_freebooter.40.b
+		custom_tooltip = nsc_freebooter.40.b.tooltip
+		trigger = { exists = solar_system }
+		hidden_effect = {
+			if = {
+				limit = {
+					exists = owner
+					exists = leader
+					leader = { has_leader_flag = great_khan }
+				}
+				owner = {
+					ordered_owned_fleet = {
+						limit = {
+							exists = solar_system
+							is_mobile = yes
+							NOR = {
+								is_civilian = yes
+								is_in_combat = yes
+								has_fleet_flag = satrapy_garrison_fleet
+								fleet_power < 2000
+							}
+							exists = controller
+							controller = { is_same_empire = owner }
+						}
+						position = 0
+						order_by = trigger:fleet_power
+						# save_event_target_as = khan_fleet
+						if = {
+							limit = { exists = leader }
+							unassign_leader = leader
+						}
+						assign_leader = root.leader
+					}
+				}
+			}
+			if = {
+				limit = { exists = leader }
+				unassign_leader = leader
+			}
+			# Owner
+			if = {
+				limit = {
+					owner = {
+						has_resource = { type = energy amount > 2000 }
+						has_resource = { type = alloys amount > 3000 }
+						has_resource = { type = volatile_motes amount > 100 }
+						has_resource = { type = exotic_gases amount > 100 }
+						has_resource = { type = rare_crystals amount > 100 }
+					}
+				}
+				owner = {
+					set_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened
+					add_resource = {
+						# energy = -2000
+						alloys = -3000
+						volatile_motes = -100
+						exotic_gases = -100
+						rare_crystals = -100
+					}
+				}
+				enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT location = this owner = owner }
+			}
+			# Combatant
+			if = {
+				limit = {
+					exists = from
+					exists = from.owner
+					from.owner = {
+						merg_is_default_empire = yes
+						has_resource = { type = energy amount > 2000 }
+						has_resource = { type = alloys amount > 3000 }
+						has_resource = { type = volatile_motes amount > 100 }
+						has_resource = { type = exotic_gases amount > 100 }
+						has_resource = { type = rare_crystals amount > 100 }
+						NOR = { has_special_project = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT has_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened }
+					}
+				}
+				owner = {
+					set_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened
+					add_resource = {
+						# energy = -2000
+						alloys = -3000
+						volatile_motes = -100
+						exotic_gases = -100
+						rare_crystals = -100
+					}
+				}
+				enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT location = this owner = from.owner }
+			}
+			# All other chance to get the ship
+			every_playable_country = {
+				limit = {
+					is_gestalt = no
+					root.solar_system = {
+						is_surveyed = { who = prev status = yes }
+						has_access_fleet = prev
+					}
+					NOR = { has_special_project = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT has_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened }
+					has_resource = { type = energy amount > 2000 }
+					has_resource = { type = alloys amount > 3000 }
+					has_resource = { type = volatile_motes amount > 100 }
+					has_resource = { type = exotic_gases amount > 100 }
+					has_resource = { type = rare_crystals amount > 100 }
+					any_system_within_border = { has_hyperlane_to = root.solar_system }
+					any_owned_fleet = {
+						is_ship_class = shipclass_constructor
+						can_access_system = root.solar_system						# performance-intensive trigger!
+					}
+				}
+				add_resource = {
+					# energy = -2000
+					alloys = -3000
+					volatile_motes = -100
+					exotic_gases = -100
+					rare_crystals = -100
+				}
+				prev = {
+					enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT location = this owner = prev }
+				}
+			}
+		}
+		ai_chance = { base = 5 }
+	}
+}
+
+# 'NSC_FREEBOOTER_KHAN_SHIP_REPAIR_PROJECT' special project effect event
+ship_event = {
+	id = nsc_freebooter.41
+	title = "nsc_freebooter.41.name"
+	desc = "nsc_freebooter.41.desc"
+	picture = GFX_evt_automated_dreadnought
+	show_sound = event_construction
+	location = fromfrom
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		owner = {
+			NOT = { has_active_event = { nsc_freebooter.41 } }
+		}
+	}
+	immediate = {
+		fromfrom = {
+			set_owner = root.owner
+			repair_percentage = 0.25
+			owner = { remove_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened }
+			set_disabled = no
+			fleet = {
+				set_owner = root.owner
+				every_owned_ship = { set_disabled = no }
+				if = {
+					limit = {
+						owner = { has_country_flag = nsc_freebooter_khan_flagship_owner }
+						NAND = {
+							exists = leader
+							leader = { has_leader_flag = great_khan }
+						}
+					}
+					root.owner = {
+						if = {
+							limit = { any_owned_leader = { leader_class = commander has_leader_flag = great_khan } }
+							random_owned_leader = {
+								limit = { leader_class = commander has_leader_flag = great_khan }
+								prevprev = { assign_leader = prev }
+							}
+						}
+						else = { create_khan_dummy = yes }
+					}
+				}
+				set_event_locked = no
+			}
+		}
+	}
+	option = { name = nsc_freebooter.41.a }
+}
+
+# Temp fix workaround (on_single_player_save_game_load)
+event = {
+	id = nsc_freebooter.99
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		# DEPRECATE pc_nsc_freebooter_habitat?
+		if = {
+			limit = { NOT = { has_global_flag = has_nsc_freebooters_mod } }
+			set_global_flag = has_nsc_freebooters_mod
+			every_galaxy_planet = {
+				limit = { is_planet_class = pc_nsc_freebooter_habitat }
+				change_pc = pc_habitat
+				calculate_modifier = yes
+				check_planet_employment = yes
+			}
+		}
+		if = {
+			limit = { has_global_flag = has_nsc_freebooters_mod }
+			remove_global_flag = has_nsc_freebooters_mod
+			every_galaxy_planet = {
+				limit = {
+					merg_is_habitat = yes
+					has_owner = yes
+					exists = owner
+					owner = { is_freebooter_empire = yes }
+					has_planet_flag = habitat
+					has_planet_flag = colony_event
+					NAND = {
+						has_orbital_station = yes
+						exists = orbital_station
+						orbital_station = {
+							is_scope_type = fleet
+							OR = {
+								has_fleet_flag = science_orbital
+								has_fleet_flag = mining_orbital
+								has_fleet_flag = energy_orbital
+							}
+						}
+					}
+				}
+				change_pc = pc_habitat
+				calculate_modifier = yes
+				check_planet_employment = yes
+			}
+		}
+		# Fix boarding
+		# random_playable_country = {
+		# 	limit = {
+		# 		is_freebooter_empire = yes
+		# 		any_owned_fleet = {
+		# 			is_mobile = yes is_disabled = yes
+		# 			count_owned_ship = { limit = { has_ship_flag = nsc_freebooter_ship_target } count = 0 }
+		# 		}
+		# 	}
+		# 	every_owned_fleet = {
+		# 		limit = { is_disabled = yes }
+		# 		set_event_locked = no
+		# 		every_owned_ship = { set_disabled = no }
+		# 		set_controller = prev
+		# 	}
+		# }
+	}
+}

@@ -1,0 +1,107 @@
+has_farming_designation = {
+	OR = {
+		has_designation = col_farming
+		has_designation = col_ring_farming
+		has_designation = col_habitat_farming
+		has_designation = col_habitat_nsc_freebooter_farming
+		has_designation = col_habitat_gestalt_farming
+	}
+}
+
+has_fortress_designation = {
+	or = {
+		has_designation = col_fortress
+		has_designation = col_habitat_fortress
+		has_designation = col_habitat_nsc_freebooter_fortress
+	}
+}
+
+has_factory_designation = {
+	OR = {
+		has_designation = col_capital_factory
+		has_designation = col_factory
+		has_designation = col_mac_factory
+		has_designation = col_ecu_factory
+		has_designation = col_habitat_factory
+		has_designation = col_habitat_nsc_freebooter_factory
+	}
+}
+
+has_foundry_designation = {
+	OR = {
+		has_designation = col_capital_foundry
+		has_designation = col_foundry
+		has_designation = col_ecu_foundry
+		has_designation = col_habitat_foundry
+		has_designation = col_habitat_nsc_freebooter_foundry
+		has_designation = col_mac_foundry
+		has_designation = col_hiv_foundry
+	}
+}
+
+# has_generator_designation = {
+# 	OR = {
+# 		has_designation = col_generator
+# 		has_designation = col_habitat_energy
+# 		has_designation = col_ring_generator
+# 	}
+# }
+
+# has_industrial_designation = {
+# 	OR = {
+# 		has_designation = col_industrial
+# 		has_designation = col_habitat_industrial
+# 		has_designation = col_habitat_nsc_freebooter_industrial
+# 		has_designation = col_ecu_industrial
+# 	}
+# }
+
+has_mining_designation = {
+	OR = {
+		has_designation = col_habitat_mining
+		has_designation = col_habitat_nsc_freebooter_mining
+		has_designation = col_mining
+	}
+}
+
+has_refinery_designation = {
+	OR = {
+		has_designation = col_refinery
+		has_designation = col_habitat_refinery
+		has_designation = col_habitat_nsc_freebooter_refinery
+	}
+}
+
+has_research_designation = {
+	OR = {
+		has_designation = col_research
+		has_designation = col_ring_research
+		has_designation = col_habitat_research
+		has_designation = col_habitat_nsc_freebooter_research
+		has_designation = col_ecu_research
+	}
+}
+
+# has_unity_designation = {
+# 	OR = {
+# 		has_designation = col_bureau
+# 		has_designation = col_habitat_bureau
+# 		has_designation = col_bureau_machine
+# 		has_designation = col_trophy_machine
+# 		has_designation = col_habitat_bureau_machine
+# 		has_designation = col_bureau_hive
+# 		has_designation = col_habitat_bureau_hive
+# 		has_designation = col_bureau_spiritualist
+# 		has_designation = col_habitat_bureau_spiritualist
+# 	}
+# }
+
+# has_trade_designation = {
+# 	OR = {
+# 		has_designation = col_capital_trade
+# 		has_designation = col_city
+# 		has_designation = col_habitat_trade
+# 		has_designation = col_ring_trade
+# 		has_designation = col_ecu_mix
+# 	}
+# }

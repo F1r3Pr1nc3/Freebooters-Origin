@@ -1,0 +1,40 @@
+nsc_freebooter_gov_marauder_khanate = {
+	ruler_title = RT_GREAT_KHAN
+
+	should_force_rename = yes
+	use_regnal_names = yes
+
+	possible = {
+		is_freebooter_empire = yes
+		has_civic = nsc_freebooter_civic_great_khans_vision
+	}
+
+	weight = {
+		base = @gov_civic_override_weight
+	}
+}
+
+# Successor Khanate - Vanilla compat.
+gov_successor_khanate = {
+	ruler_title = RT_KHAN
+
+	should_force_rename = yes
+	use_regnal_names = yes
+
+	possible = {
+		OR = {
+			AND = {
+				is_freebooter_empire = yes
+				has_civic = nsc_freebooter_civic_great_khans_vision
+			}
+			AND = {
+				has_origin = origin_khan_successor
+				has_civic = civic_great_khans_legacy
+			}
+		}
+	}
+
+	weight = {
+		base = @gov_ai_weight
+	}
+}

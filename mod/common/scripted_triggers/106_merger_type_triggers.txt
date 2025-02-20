@@ -1,0 +1,347 @@
+# Overriddes the Merger of Rules.
+# v3.7.2 snyc
+# is_homicidal = {
+# 	OR = {
+# 		has_valid_civic = civic_fanatic_purifiers
+# 		has_valid_civic = civic_machine_terminator
+# 		has_valid_civic = civic_hive_devouring_swarm
+# 		# has_origin = origin_void_reavers
+# 	}
+# }
+
+# is_unfriendly = {
+# 	OR = {
+# 		is_homicidal = yes
+# 		has_valid_civic = civic_barbaric_despoilers
+# 	}
+# }
+
+# Expanded version of country_type = default
+merg_is_default_empire = {
+	OR = {
+		is_country_type = default
+		# Darkspace
+		# is_country_type = ds_nomads TODO
+		# Ethics & Civics Infinity
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = uo_une_member_active
+			"
+			toggle = @post_revolutionary_re_revolution_years
+		}
+		# Scripted Triggers Undercoat
+		# has_country_flag = is_playable
+		# has_country_flag = is_empire # Underscore
+		# The Empty Vagrant
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_default_ev_country_type = yes
+			"
+			toggle = @homeless_class_trait_weight
+		}
+		# ZOFE
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_zofe_country = yes
+			"
+			toggle = @has_zofe_vanilla
+		}
+		# Human Fallen Empire
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = hfe_features_exodus
+			"
+			toggle = @hfe_pirate_base_cost
+		}
+		# Nomads: The wondering Void Farers. TODO
+		# is_void_farer = yes
+	}
+}
+
+# Merger of Rules scripted triggers, very similar to vanilla is_country_type_with_subjects
+# Extended Merger of Rules with Nomads: The wondering Void Farers
+# These triggers are also meant as a library for modders who want to reuse them in their own mods.
+is_default_or_fallen = {
+	OR = {
+		is_country_type = default
+		is_fallen_empire = yes
+		# ZOFE
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_zofe_country = yes
+			"
+			toggle = @has_zofe_vanilla
+		}
+		# The Empty Vagrant
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_default_ev_country_type = yes
+		is_country_type = fallen_empire_ev
+		is_country_type = awakened_fallen_empire_ev
+			"
+			toggle = @homeless_class_trait_weight
+		}
+		# Ethics & Civics Infinity
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = uo_une_member_active
+			"
+			toggle = @post_revolutionary_re_revolution_years
+		}
+		# Human Fallen Empire
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = hfe_features_exodus
+		is_country_type = hfe_fallen
+			"
+			toggle = @hfe_pirate_base_cost
+		}
+	}
+}
+
+# List of dormant/standard Fallen Empires
+merg_is_fallen_empire = {
+	OR = {
+		is_country_type = fallen_empire
+		# Human Fallen Empire
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = hfe_fallen
+			"
+			toggle = @hfe_pirate_base_cost
+		}
+		# AshArms Aquarius History of the Lost Empire
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = LsE_fallen_empire
+			"
+			toggle = @asharm_mod
+		}
+		# SW:KUAT ANCIENT EMPIRE
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = kuat_fallen_empire
+			"
+			toggle = @sw_kuat_mod
+		}
+		# The Empty Vagrant
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = fallen_empire_ev
+			"
+			toggle = @homeless_class_trait_weight
+		}
+		inline_script = { # The Sleeper
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = the_sleeper_fallen
+			"
+			toggle = @has_the_sleeper_mod
+		}
+		# ZOFE With its last submod, ZOFE's fallen and awakened empires work differently and should not be here. # is_country_type = lost_empire
+	}
+}
+
+# List of awakened Fallen Empires.
+merg_is_awakened_fe = {
+	OR = {
+		is_country_type = awakened_fallen_empire
+		# SW:KUAT ANCIENT EMPIRE
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = kuat_awakened_fallen_empire
+		is_country_type = awakened_return_kuat_empire
+			"
+			toggle = @sw_kuat_mod
+		}
+		inline_script = { # A Deadly Tempest
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = awakened_gate_builders
+			"
+			toggle = @has_a_deadly_tempest_mod
+		}
+		inline_script = { # The Sleeper
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = awakened_sleeper
+			"
+			toggle = @has_the_sleeper_mod
+		}
+		# The Empty Vagrant
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = awakened_fallen_empire_ev
+		is_country_type = awakened_fallen_empire_event
+			"
+			toggle = @homeless_class_trait_weight
+		}
+		# Wula Fallen Empire
+		inline_script = {
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = first_emperor_awakened_fallen_empire
+			"
+			toggle = @wula_compatch_var
+		}
+		# ZOFE With its last submod, ZOFE's fallen and awakened empires work differently and should not be here. # is_country_type = ascended_empire
+	}
+}
+
+### Mid-Game Crises general trigger ###
+is_marauder = {
+	OR = {
+		is_country_type = dormant_marauders
+		is_country_type = ruined_marauders
+		is_country_type = awakened_marauders
+		is_country_type = marauder_raiders
+		inline_script = { # The Empty Vagrant
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = awakened_marauders_ev
+			"
+			toggle = @homeless_class_trait_weight
+		}
+	}
+}
+# Scripted undercoat
+is_endgame_crisis = {
+	OR = {
+		is_country_type = extradimensional
+		is_country_type = extradimensional_2
+		is_country_type = extradimensional_3
+		is_country_type = swarm
+		is_country_type = ai_empire
+		is_country_type = synth_queen
+		is_country_type = awakened_synth_queen
+		is_country_type = synth_queen_storm
+		# TODO
+		# inline_script = { # ACOT SBTG
+		# 	script = merger_of_rules/toggled_code
+		# 	code = "
+		# 		is_country_type = sbtg_stellarborne_empire
+		# 	"
+		# 	toggle = @has_sbtg_mod
+		# }
+		inline_script = { # Gigastructural Engineering & More
+			script = merger_of_rules/toggled_code
+			code = "
+		is_giga_crisis_faction = yes
+			"
+			toggle = @has_gigastructures
+		}
+	}
+}
+
+# FOR CUSTODIAN
+is_crisis_faction = {
+	OR = {
+		is_endgame_crisis = yes
+		is_country_type = gray_goo
+		is_country_type = awakened_marauders
+		is_country_type = voidworms_crisis
+		# is_country_type = formless removed in v3.12.3
+		# is_cruel_abomination_country_type = yes # Cruel Conquerers
+		# Destiny: The Darkness Crisis
+		# is_country_type = darkness_country TODO
+		inline_script = { # Shroud Rising
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = shroud_horrors
+		is_country_type = shroud_entities
+		is_country_type = shroud_cult
+			"
+			toggle = @has_shroud_rising_mod
+		}
+		# Solar Storm
+		# is_country_type = abyssal_host_invaders_type
+		# is_country_type = SSAB_ab_country_v2
+		# is_country_type = SSAB_ab_remnant
+		inline_script = { # The Sleeper
+			script = merger_of_rules/toggled_code
+			code = "
+		is_country_type = berserker_awoken_hive
+			"
+			toggle = @has_the_sleeper_mod
+		}
+	}
+}
+
+# merg_is_slaver = {
+# 	OR = {
+# 		has_valid_civic = civic_slaver_guilds
+# 		has_valid_civic = civic_indentured_assets
+# 		has_valid_civic = civic_barbaric_despoilers
+# 		# Ethics and Civics Alternative - FunEFork / Ethics & Civics: Bug Branch
+# 		inline_script = {
+# 			script = merger_of_rules/toggled_code
+# 			code = "
+# 				has_valid_civic = civic_slaving_despots
+# 				has_valid_civic = civic_slaving_despots_corpo
+# 			"
+# 			toggle = @[ has_eca_funefork + has_bug_branch ]
+# 		}
+# 		# Ethics and Civics Classic
+# 		inline_script = {
+# 			script = merger_of_rules/toggled_code
+# 			code = "
+# 				has_valid_civic = civic_barbaric_despoilers_corporate
+# 				has_valid_civic = civic_divine_order
+# 			"
+# 			toggle = @has_ecc_cog
+# 		}
+# 		# ZOFE
+# 		inline_script = {
+# 			script = merger_of_rules/toggled_code
+# 			code = "
+# 				has_valid_civic = civic_master_race
+# 			"
+# 			toggle = @has_zofe_vanilla
+# 		}
+# 	}
+# }
+# merg_is_void_dweller = {
+# 	OR = {
+# 		has_origin = origin_void_dwellers
+# 		has_origin = origin_void_machines
+# 		# Freebooters
+# 		has_origin = origin_nsc_freebooter
+# 		has_origin = origin_nsc_freebooter_federations
+# 		# More Events Mod
+# 		inline_script = {
+# 			script = merger_of_rules/toggled_code
+# 			code = "
+# 				has_origin = origin_mem_eden_protocol
+# 			"
+# 			toggle = @has_more_events_mod
+# 		}
+# 	}
+# }
+# merg_is_nomad = {
+# 	OR = {
+# 		# The Empty Vagrant
+# 		inline_script = {
+# 			script = merger_of_rules/toggled_code
+# 			code = "
+# 		is_country_type = default_ev
+# 			"
+# 			toggle = @homeless_class_trait_weight
+# 		}
+# 		# Darkspace
+# 		is_country_type = ds_nomads
+# 	}
+# }

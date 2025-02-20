@@ -1,0 +1,48 @@
+has_nsc_freebooters_active = {
+	always = yes
+}
+
+# To compare factions to a freebooter lifestyle or origin, we'll look for factions that emphasize themes like piracy, nomadic existence, scavenging, and a generally adventurous or lawless way of life.
+# Each of these factions could have unique origins and playstyles that align with the freebooter theme, making them a great fit for players looking to experience a more lawless and adventurous side of Stellaris.
+is_freebooter_empire = {
+	OR = {
+		has_origin = origin_nsc_freebooter
+		has_origin = origin_nsc_freebooter_federations
+		has_origin = origin_khan_successor
+		has_origin = origin_treasure_hunters
+		inline_script = { # All That is Grimdark
+			script = merger_of_rules/toggled_code
+			code = "
+			has_origin = origin_barbarichorde
+			"
+			toggle = @has_allthatisgrimdark_mod
+		}
+		AND = { has_origin = origin_legendary_leader_death has_civic = nsc_freebooter_civic_great_khans_vision }
+		## Corsairs of the Void**: (e.g. Eldar) This faction could embody the quintessential space pirate lifestyle, focusing on raiding, pillaging, and living off the spoils of war. They might operate from hidden bases and use hit-and-run tactics to survive in the harsh galaxy.
+		## The Nomadic Marauders**: As their name suggests, this faction lives a nomadic existence, constantly on the move to avoid stronger forces and find new opportunities for plunder. They might have special bonuses for mobility and adaptability.
+		## The Scrap Collectors**: A faction that thrives on scavenging the remnants of battles and derelict ships. Their origin could involve starting in a junkyard system rich in resources but requiring them to fend off other scavengers and pirates.
+		## The Free Traders**: While not strictly pirates, this faction could represent a more lawful version of the freebooter lifestyle, focusing on trade, smuggling, and avoiding heavy regulations. They could have origins that involve escaping from a highly regulated home system to seek freedom among the stars.
+		## The Outcasts**: This faction starts as a group of exiles or criminals who have banded together to survive. Their society might be built on a mix of piracy, trade, and mercenary work, giving them a diverse set of skills and a reputation as rogues and adventurers.
+	}
+	is_democracy = no
+}
+# Vanilla overwrite!!
+has_void_dweller_origin = {
+	OR = {
+		has_origin = origin_void_dwellers
+		has_origin = origin_void_machines
+		is_freebooter_empire = yes
+	}
+}
+# is_void_dweller_empire = {
+# 	OR = {
+# 		has_ascension_perk = ap_voidborn
+# 		has_void_dweller_origin = yes
+# 		has_origin = origin_nsc_freebooter
+# 	}
+# }
+
+has_not_federations_dlc = { # Necessary for prescripted empires, which do not support arguments
+	optimize_memory
+	has_federations_dlc = no
+}

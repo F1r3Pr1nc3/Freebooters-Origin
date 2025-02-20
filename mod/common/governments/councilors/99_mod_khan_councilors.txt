@@ -1,0 +1,15 @@
+councilor_great_khans_legacy_2 = {
+	leader_class = { commander }
+	is_leader_possible = {
+		OR = {
+			leader_class = commander
+		}
+	}
+	civic = civic_great_khans_legacy_2
+	modifier = {
+		country_war_exhaustion_mult = -0.05
+		country_claim_influence_cost_mult = -0.05
+		ship_starting_experience_add = 100
+		army_starting_experience_add = 100
+	}
+}

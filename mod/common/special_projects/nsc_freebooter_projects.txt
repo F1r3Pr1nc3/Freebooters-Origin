@@ -1,0 +1,126 @@
+special_project = {
+	key = "NSC_FREEBOOTER_BOARDED_SHIP_REPAIR_PROJECT"
+	# cost = 0
+	days_to_research = 90
+	timelimit = 540
+	tech_department = engineering_technology
+	picture = GFX_evt_space_debris
+	location = yes
+
+	event_scope = ship_event
+
+	requirements = { shipclass_constructor = 1 }
+
+	on_success = {
+		if = {
+			limit = { exists = from }
+			ship_event = { id = nsc_freebooter.37 scopes = { from = from fromfrom = fromfrom } }
+		}
+	}
+	AI_wait_days = { weight = 80 }
+	# this = country
+	# from = project scope (matches setting in "event_scope" i.e. ship/planet/country). Might not exist!
+	# fromfrom = location scope, if set (usually a planet)
+	on_fail = {
+		country_event = { id = nsc_freebooter.3701 scopes = { from = from fromfrom = fromfrom } }
+	}
+	abort_trigger = {
+		NAND = {
+			exists = fromfrom
+			fromfrom = { is_disabled = yes }
+		}
+	}
+}
+special_project = {
+	key = "NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT"
+	cost = 20000
+	tech_department = engineering_technology
+	picture = GFX_evt_automated_dreadnought
+
+	event_scope = planet_event
+
+	on_success = {
+		owner = { country_event = { id = nsc_freebooter.39 } }
+	}
+
+	on_fail = {}
+}
+
+special_project = {
+	key = "NSC_FREEBOOTER_KHAN_SHIP_REPAIR_PROJECT"
+	# cost = 0
+	days_to_research = 180
+	timelimit = 3600
+	tech_department = engineering_technology
+	picture = GFX_evt_sabotaged_ship
+	location = yes
+
+	event_scope = ship_event
+
+	requirements = { shipclass_constructor = 1 }
+
+	on_success = {
+		ship_event = { id = nsc_freebooter.41 }
+	}
+
+	on_fail = {
+		# destroy_ship = fromfrom
+		fromfrom = { enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT location = this owner = owner } }
+		every_playable_country = {
+			limit = {
+				root.solar_system = {
+					is_surveyed = { who = prev status = yes }
+				}
+				NOT = { has_special_project = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT }
+			}
+			fromfrom = {
+				enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT location = this owner = prev }
+			}
+		}
+	}
+}
+
+# Automated Dreadnought Project
+special_project = {
+	key = "NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT"
+	# cost = 10000
+	energy = 2000
+	days_to_research = 360
+	timelimit = 1800
+	tech_department = engineering_technology
+	picture = GFX_evt_automated_dreadnought
+	location = yes
+
+	event_scope = ship_event
+
+	requirements = { shipclass_constructor = 1 }
+
+	abort_trigger = {
+		NAND = {
+			exists = fromfrom
+			fromfrom = { is_disabled = no }
+		}
+	}
+
+	on_success = {
+		ship_event = { id = nsc_freebooter.41 }
+	}
+
+	on_fail = {
+		if = {
+			limit = { owner = { has_country_flag = nsc_freebooter_khan_flagship_owner } }
+			fromfrom = { enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT" location = this owner = owner } }
+		}
+		else = {
+			owner = {
+				add_resource = {
+					alloys = 3000
+					volatile_motes = 100
+					exotic_gases = 100
+					rare_crystals = 100
+				}
+			}
+			destroy_ship = fromfrom
+		}
+	}
+}

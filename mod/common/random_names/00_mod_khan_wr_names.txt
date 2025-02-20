@@ -1,0 +1,23 @@
+war_name_parts_list = {
+	key = "satrapy_war_names"
+	parts = {
+		War_of_Subjugation = 1
+		War_of_Obedience = 1
+		War_of_Overlordship = 1
+	}
+}
+
+war_name_parts_list = {
+	key = "war_of_the_diadochi_war_names"
+	parts = {
+		War_of_the_Diadochi = 1
+	}
+}
+
+war_name_parts_list = {
+	key = "take_throne_war_names"
+	parts = {
+		War_for_Khans_Throne = 1
+		Struggle_for_Khans_Throne = 1
+	}
+}

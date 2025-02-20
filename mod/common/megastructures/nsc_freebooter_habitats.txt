@@ -1,0 +1,225 @@
+nsc_freebooter_habitat = {
+	entity = ""
+	construction_entity = "habitat_phase_03_entity"
+	portrait = "GFX_megastructure_construction_background"
+	place_entity_on_planet_plane = yes
+	show_galactic_map_icon = no
+	show_in_outliner = no
+	use_planet_resource = yes
+	entity_offset = { x = -7 y = -7 }
+	build_time = 1800 # @central_orbital_build_time
+
+	resources = {
+		category = megastructures_habitat
+		cost = {
+			alloys = 3000 # Vanilla habitat cost 1500 + decision_upgrade_habitat cost 1000 + decision_upgrade_habitat_2 cost 1500
+			influence = 150 # Still the habitat has 4 more district slots but let's just say it's a unique bonus for the origin
+		}
+	}
+	construction_blocks_and_blocked_by = self_type
+
+	potential = { is_freebooter_empire = yes }
+
+	possible = {
+		hidden_trigger = { exists = starbase }
+		custom_tooltip = { fail_text = "requires_inside_border" is_inside_border = from }
+		custom_tooltip = {
+			fail_text = "requires_not_habitat_central_complex"
+			NOR = {
+				any_system_planet = { has_planet_flag = habitat }
+				has_megastructure = habitat_central_complex_ruined
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_orbital_debris"
+			count_system_planet = { limit = { has_planet_flag = has_orbital_debris } count = 0 }
+		}
+		# There is only one habitat allowed
+		count_fleet_in_system = {
+			limit = {
+				is_ship_size = constructor
+				has_fleet_order = build_megastructure_fleet_order
+				exists = orbit
+				orbit = { is_star = no }
+			}
+			count = 0
+		}
+	}
+
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = { fail_text = "requires_surveyed_planet" is_surveyed = { who = prev.from status = yes } } # Prevent leaking habitability information
+			custom_tooltip = { fail_text = "requires_no_anomaly" has_anomaly = no }
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				# can_build_megastructure_on_planet = yes
+				OR = { is_artificial = no merg_is_relic_world = yes }
+				NOR = {
+					has_planet_flag = megastructure
+					# AND = {
+					# 	has_planet_flag = has_megastructure there is a vanilla bug here which does not remove this flag an dismantle
+					# 	# Special exception so you can build an orbital ring even if you have MSI's warship as a habitat.
+					# 	NOT = { has_planet_flag = has_payback_habitat }
+					# 	has_orbital_station = no # (allow orbitals)
+					# }
+					# Bug workaround # (allow orbitals)
+					# AND = {
+					# 	exists = orbit
+					# 	orbit = { is_scope_type = planet merg_is_habitat = yes }
+					# }
+					solar_system = {
+						OR = {
+							has_star_flag = ring_world_built
+							has_star_flag = ithomes_gate
+						}
+					}
+					# is_planet_class = pc_ringworld_habitable_damaged
+					# is_planet_class = pc_ringworld_tech
+					# is_planet_class = pc_ringworld_tech_damaged
+					# is_planet_class = pc_ringworld_seam
+					# is_planet_class = pc_ringworld_seam_damaged
+					has_any_megastructure = yes
+					has_ringworld_output_boost = yes
+					merg_is_habitat = yes
+				}
+			}
+ 			# Balance for habitats
+			custom_tooltip = { fail_text = "requires_not_minor_planetary_body" is_asteroid = no is_moon = no }
+			custom_tooltip = { fail_text = "requires_not_astral_scar" is_astral_scar = no }
+			custom_tooltip = { fail_text = "requires_not_star" is_star = no }
+			custom_tooltip = { fail_text = "requires_not_solarpunk" NOT = { solar_system = { has_star_flag = solarpunk_system_02 } } }
+			NAND = { # Use normal habitat instead
+				from = { is_ai = yes }
+				OR = {
+					has_deposit_for = shipclass_mining_station
+					has_deposit_for = shipclass_research_station
+				}
+			}
+		} # Use these for all non-star megastructures
+	}
+
+	# root = system
+	# from = country
+	ai_weight = {
+		factor = 5
+		modifier = { factor = 0
+			OR = {
+				starbase = { NOT = { has_starbase_size >= starbase_starport } }	# AI shouldn't build habitats if they don't have starports in the system
+				any_system_planet = { is_colony = no merg_is_habitat = yes }	# AI shouldn't build habitats if they have any uncolonised habitats.
+			}
+		}
+		modifier = { factor = 5 exists = sector sector = { has_sector_type = core_sector } }
+		modifier = { factor = 100 OR = { has_star_flag = ideal_habitat_t1 has_star_flag = ideal_habitat_t2 } }
+		modifier = { factor = value:num_orbital_sites }
+		modifier = { factor = 2
+			OR = {
+				solar_system = { is_capital_system = yes is_owned_by = from }
+				any_neighbor_system = { is_capital_system = yes is_owned_by = from }
+			}
+		}
+		modifier = { factor = 0.1 any_neighbor_system = { has_owner = yes NOT = { is_owned_by = from } } }
+	}
+
+	on_build_start = {}
+	on_build_cancel = {}
+
+	on_build_complete = {
+		fromfrom.planet = { save_event_target_as = target_planet }
+		# if = {
+		# 	limit = { fromfrom.planet = { is_star = yes } }
+		# 	spawn_habitat_effect = { DISTANCE = 19.798 }
+		# }
+		# else = {
+		spawn_habitat_effect = { DISTANCE = 9.899 }
+		# }
+
+		fromfrom.solar_system = { set_star_flag = has_habitat }
+
+		if = {
+			limit = {
+				event_target:target_planet = {
+					OR = {
+						has_deposit_for = shipclass_research_station
+						has_deposit_for = shipclass_mining_station
+					}
+				}
+			}
+			on_orbital_complete_effect = { BODY = major TYPE = resource }
+			if = {
+				limit = { event_target:target_planet = { has_deposit_for = shipclass_mining_station } }
+				event_target:target_habitat = {
+					add_deposit = d_nsc_freebooter_habitat
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					fromfrom.solar_system = {
+						OR = {
+							is_capital_system = no
+							AND = {
+								exists = starbase
+								starbase = { has_starbase_size > starbase_starhold }
+							}
+						}
+					}
+					from = { num_owned_planets < 7 }
+					from = { count_owned_fleet = { count < 3 limit = { is_ship_size = major_orbital_knights } } }
+				}
+			}
+			on_orbital_complete_effect = { BODY = major TYPE = knights }
+			event_target:target_habitat = {
+				change_pc = pc_habitat
+				set_planet_size = 10 # 12 vanilla 6
+				set_planet_flag = colony_event # This will prevent the most of colony events to happen here # e.g. dimensional portals, or the dancing plague events
+				set_planet_flag = toxic_knights_habitat
+				add_deposit = d_nsc_freebooter_habitat
+				set_colony_type = col_habitat_nsc_freebooter_fortress
+			}
+		}
+		else = {
+			on_orbital_complete_effect = { BODY = major TYPE = generic }
+			event_target:target_habitat = {
+				change_pc = pc_habitat
+				set_planet_size = 10 # 12 vanilla 6
+				set_planet_flag = colony_event # This will prevent the most of colony events to happen here # e.g. dimensional portals, or the dancing plague events
+				add_deposit = d_nsc_freebooter_habitat
+			}
+		}
+
+		fromfrom.solar_system = {
+			every_system_planet = {
+				limit = {
+					has_deposit_for = shipclass_mining_station
+					has_mining_station = no
+				}
+				create_mining_station = { owner = prevprev.owner }
+			}
+		}
+
+		remove_megastructure = fromfrom
+		from = { country_event = { id = megastructures.10 } } # utopia.61
+		# There is only one habitat allowed
+		if = {
+			limit = {
+				any_fleet_in_system = {
+					is_ship_size = constructor
+					has_fleet_order = build_megastructure_fleet_order
+					exists = orbit
+					orbit = { is_star = no }
+				}
+			}
+			random_fleet_in_system = { # One is enough ;-)
+				limit = {
+					is_ship_size = constructor
+					has_fleet_order = build_megastructure_fleet_order
+					exists = orbit
+					orbit = { is_star = no }
+				}
+				clear_orders = yes
+				clear_fleet_actions = this
+			}
+		}
+	}
+}

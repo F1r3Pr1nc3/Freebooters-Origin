@@ -1,0 +1,49 @@
+@level_2_xp_cost = 1200 # 10 years at 100 Loyalty.
+@level_3_xp_cost = 3600 # 30 years at 100 Loyalty.
+@specialist_base_conversion_time = 20
+
+# If you add any new types or change the keys of the existing ones, make sure to change the level-up message_types for them and their loc keys
+
+specialist_satrapy = {
+	icon = "GFX_diplomacy_specialist_subject_bulwark"
+	icon_large = "GFX_diplomacy_specialist_subject_bulwark_large"
+	preferred_ethic = ethic_militarist
+	base_conversion_time = @specialist_base_conversion_time
+
+	on_progress_complete = {
+	}
+
+	levels = {
+		# Level 1
+		{
+			experience_needed_for_next_level = @level_2_xp_cost
+			perks = {
+				satrapy_1_modifier
+				satrapy_1_penalties
+				satrapy_1_overlord_modifier
+				satrapy_1_satrapy_insight
+				bulwark_1_neighbor_bonuses
+			}
+		}
+		# Level 2
+		{
+			experience_needed_for_next_level = @level_3_xp_cost
+			perks = {
+				satrapy_2_modifier
+				satrapy_2_penalties
+				satrapy_2_satrapy_insight
+				satrapy_2_leaders
+				satrapy_2_transports
+			}
+		}
+		# Level 3
+		{
+			perks = {
+				satrapy_3_modifier
+				satrapy_3_penalties
+				satrapy_3_satrapy_insight
+				satrapy_3_banners
+			}
+		}
+	}
+}

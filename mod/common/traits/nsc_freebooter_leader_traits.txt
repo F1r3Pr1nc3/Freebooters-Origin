@@ -1,0 +1,84 @@
+nsc_freebooter_leader_trait_ruler_great_khan = {
+	cost = 0
+	leader_trait_type = destiny
+	force_councilor_trait = yes
+	inline_script = {
+		script = trait/icon
+		CLASS = leader
+		ICON = "GFX_leader_trait_great_khan"
+		RARITY = paragon
+		COUNCIL = yes
+		TIER = none
+	}
+	councilor_modifier = {
+		leader_lifespan_add = 25
+		army_morale = 0.25
+		ship_weapon_damage = 0.1
+	}
+	leader_class = { official commander }
+	initial = no
+	randomized = no
+}
+nsc_freebooter_leader_trait_ruler_child_of_great_khan = {
+	cost = 0
+	leader_trait_type = destiny
+	force_councilor_trait = yes
+	inline_script = {
+		script = trait/icon
+		CLASS = leader
+		ICON = "GFX_leader_trait_great_khan"
+		RARITY = veteran
+		COUNCIL = yes
+		TIER = none
+	}
+	councilor_modifier = {
+		army_morale = 0.1
+		ship_weapon_damage = 0.05
+	}
+	leader_class = { official commander }
+	initial = no
+	randomized = no
+}
+nsc_freebooter_admiral_trait_great_khan = {
+	cost = 0
+	leader_trait_type = destiny
+	inline_script = {
+		script = trait/icon
+		CLASS = commander
+		ICON = "GFX_leader_trait_great_khan"
+		RARITY = paragon
+		COUNCIL = no
+		TIER = none
+	}
+	self_modifier = {
+		leader_lifespan_add = 25
+	}
+	fleet_modifier = {
+		ship_fire_rate_mult = 0.1
+		ship_speed_mult = 0.1
+		ship_weapon_damage = 0.1
+	}
+	leader_class = { commander }
+	initial = no
+	randomized = no
+}
+nsc_freebooter_admiral_trait_child_of_great_khan = {
+	cost = 0
+	leader_trait_type = destiny
+	inline_script = {
+		script = trait/icon
+		CLASS = commander
+		ICON = "GFX_leader_trait_great_khan"
+		RARITY = veteran
+		COUNCIL = no
+		TIER = none
+	}
+	fleet_modifier = {
+		ship_fire_rate_mult = 0.05
+		ship_speed_mult = 0.05
+		ship_weapon_damage = 0.05
+	}
+	leader_class = { commander }
+	initial = no
+	randomized = no
+}

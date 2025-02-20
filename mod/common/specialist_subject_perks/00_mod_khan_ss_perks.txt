@@ -1,0 +1,137 @@
+satrapy_1_modifier = {
+	main_perk = yes
+	subject_modifier = {
+		army_damage_mult = 0.25
+		army_health = 0.25
+		armies_cost_mult = -0.25
+		armies_upkeep_mult = -0.25
+		job_soldier_stability_add = 3
+	}
+	# For setting the room background
+	activate_effect = {
+		target = {
+			store_country_backup_data = {
+				flag = no
+				room = yes
+				name = no
+				ethics = no
+				government = no
+			}
+			room_name_override = ""
+		}
+	}
+	# Restore room background back to normal
+	deactivate_effect = {
+		target = { restore_country_backup_data = yes }
+	}
+}
+
+satrapy_1_penalties = {
+	main_perk = yes
+	subject_modifier = { country_consumer_goods_produces_mult = -0.1 country_unity_produces_mult = -0.1 country_naval_capacity_contribution_to_overlord_mult = 0.15 }
+}
+
+satrapy_1_overlord_modifier = {
+	icon = "GFX_specialist_perk_bulwark_1_overlord_modifier"
+	overlord_modifier = {
+		army_morale_damage_mult = 0.5
+		army_morale = 0.5
+		ship_orbital_bombardment_mult = 1
+		ship_damage_against_starbases_mult = 0.5
+	}
+}
+
+bulwark_1_neighbor_bonuses = {
+	icon = "GFX_specialist_perk_bulwark_1_neighbor_bonuses"
+	overlord_relay_network_modifier = { specialist_bulwark_neighbor = 1 }
+	desc = { description = bulwark_1_neighbor_bonuses_desc }
+}
+
+satrapy_1_satrapy_insight = {
+	icon = "GFX_specialist_perk_bulwark_1_bulwark_insight"
+	activate_effect = {
+		target = {
+			if = {
+				limit = { NOT = { has_technology = tech_global_defense_grid } }
+				give_technology = { tech = tech_global_defense_grid message = yes }
+			}
+			append_technology = { TECH = interstellar_fleet_traditions }
+			append_technology = { TECH = thrusters_3 }
+		}
+	}
+	desc = { description = satrapy_1_satrapy_insight_desc }
+}
+
+satrapy_2_modifier = {
+	main_perk = yes
+	subject_modifier = {
+		army_damage_mult = 0.5
+		army_health = 0.5
+		armies_cost_mult = -0.5
+		armies_upkeep_mult = -0.5
+		job_soldier_stability_add = 5
+	}
+}
+
+satrapy_2_penalties = {
+	main_perk = yes
+	subject_modifier = { country_consumer_goods_produces_mult = -0.2 country_unity_produces_mult = -0.2 country_naval_capacity_contribution_to_overlord_mult = 0.3 }
+}
+
+satrapy_2_satrapy_insight = {
+	icon = "GFX_specialist_perk_bulwark_2_bulwark_insight"
+	activate_effect = {
+		target = {
+			append_technology = { TECH = refit_standards }
+			append_technology = { TECH = interstellar_campaigns }
+			give_tech_no_error_effect = { MESSAGE = yes TECH = tech_centralized_command }
+		}
+	}
+	desc = { description = satrapy_2_satrapy_insight_desc }
+}
+
+satrapy_2_leaders = {
+	icon = "GFX_specialist_perk_bulwark_2_leaders"
+	subject_modifier = { commander_exp_gain = 0.5 commander_skill_levels = 1 }
+	desc = { description = satrapy_2_leaders_desc }
+}
+
+satrapy_2_transports = {
+	icon = "GFX_specialist_perk_bulwark_3_battlewright"
+	subject_modifier = { ship_speed_mult = 0.2 shipclass_transport_hull_mult = 3 shipclass_transport_disengage_mult = 0.5 }
+	desc = { description = satrapy_2_transports_desc }
+}
+
+satrapy_3_modifier = {
+	main_perk = yes
+	subject_modifier = {
+		army_damage_mult = 0.75
+		army_health = 0.75
+		armies_cost_mult = -0.75
+		armies_upkeep_mult = -0.75
+		job_soldier_stability_add = 8
+	}
+}
+
+satrapy_3_penalties = {
+	main_perk = yes
+	subject_modifier = { country_consumer_goods_produces_mult = -0.3 country_unity_produces_mult = -0.3 country_naval_capacity_contribution_to_overlord_mult = 0.45 }
+}
+
+satrapy_3_satrapy_insight = {
+	icon = "GFX_specialist_perk_bulwark_3_bulwark_insight"
+	activate_effect = {
+
+		target = {
+			append_technology = { TECH = command_matrix }
+			append_technology = { TECH = galactic_campaigns }
+			give_tech_no_error_effect = { MESSAGE = yes TECH = tech_combat_training }
+		}
+	}
+	desc = { description = satrapy_3_satrapy_insight_desc }
+}
+
+satrapy_3_banners = {
+	icon = "GFX_specialist_perk_bulwark_2_leaders"
+	desc = { description = satrapy_3_banners_desc }
+}

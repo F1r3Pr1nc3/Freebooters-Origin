@@ -1,0 +1,35 @@
+spriteTypes = {
+	spriteType = {
+		name = "GFX_specialist_tier_specialist_satrapy_1_off"
+		textureFile = "gfx/interface/subjugation/specialist_tiers/specialist_tier_bulwark_1_off.dds"
+	}
+
+	spriteType = {
+		name = "GFX_specialist_tier_specialist_satrapy_1_on"
+		textureFile = "gfx/interface/subjugation/specialist_tiers/specialist_tier_bulwark_1_on.dds"
+	}
+
+	spriteType = {
+		name = "GFX_specialist_tier_specialist_satrapy_2_off"
+		textureFile = "gfx/interface/subjugation/specialist_tiers/specialist_tier_bulwark_2_off.dds"
+	}
+
+	spriteType = {
+		name = "GFX_specialist_tier_specialist_satrapy_2_on"
+		textureFile = "gfx/interface/subjugation/specialist_tiers/specialist_tier_bulwark_2_on.dds"
+	}
+
+	spriteType = {
+		name = "GFX_specialist_tier_specialist_satrapy_3_off"
+		textureFile = "gfx/interface/subjugation/specialist_tiers/specialist_tier_bulwark_3_off.dds"
+	}
+
+	spriteType = {
+		name = "GFX_specialist_tier_specialist_satrapy_3_on"
+		textureFile = "gfx/interface/subjugation/specialist_tiers/specialist_tier_bulwark_3_on.dds"
+	}
+	spriteType = {
+		name = "GFX_message_satrapy_level_up"
+		textureFile = "gfx/interface/icons/message/message_bulwark_level_up.dds"
+	}
+}

@@ -1,0 +1,9 @@
+﻿l_russian:
+ TECH_UNLOCK_SYSTEM_FORTIFICATION_COMPLEX_DESC: "Allows the construction of multiple starbases to fortify a system. We have many threats awaiting us in the great beyond. We need to secure our borders."
+ TECH_UNLOCK_SYSTEM_FORTIFICATION_COMPLEX_TITLE: "§HUnlocks Megastructure:§! $system_fortification_complex$"
+ system_fortification_complex: "System Fortification Complex"
+ system_fortification_complex_DESC: "This §Y$system_fortification_complex$§! serves as the ultimate bulwark against enemy incursions. Featuring extensive defense grids, powerful energy shields, and advanced sensor arrays, it provides unparalleled protection to the star system, making it a critical asset in any defensive strategy."
+ system_fortification_complex_MEGASTRUCTURE: "$system_fortification_complex$"
+ system_fortification_complex_MEGASTRUCTURE_DETAILS: "An §Y$system_fortification_complex$§! is a Starbase built on anything with a big enough gravitational field within a system. Our borders are a high priority, why whould we limit outselves with a single starbase?"
+ tech_system_fortification_complex: "$system_fortification_complex$"
+ tech_system_fortification_complex_desc: "$TECH_UNLOCK_SYSTEM_FORTIFICATION_COMPLEX_DESC$"

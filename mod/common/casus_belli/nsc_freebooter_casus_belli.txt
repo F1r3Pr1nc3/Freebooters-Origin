@@ -1,0 +1,74 @@
+cb_nsc_freebooter_wrath_of_khan = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = { is_freebooter_empire = yes has_ascension_perk = ap_nsc_freebooter_wrath_of_khan }
+	is_valid = {
+		NOT = { is_overlord_to = from }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+cb_nsc_freebooter_pirate_raider = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = { is_freebooter_empire = yes has_ascension_perk = ap_nsc_freebooter_pirate_raider }
+	is_valid = {
+		NOT = { is_overlord_to = from }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_war_of_the_diadochi = {
+	show_in_diplomacy = no
+	show_notification = no
+
+	potential = {
+		merg_is_default_empire = yes
+		exists = from
+		NOT = {
+			is_in_federation_with = from
+		}
+	}
+
+	is_valid = {
+		merg_is_default_empire = yes
+		has_policy_flag = unrestricted_wars
+		has_origin = origin_khan_successor
+		NOT = { is_overlord_to = from }
+		NAND = {
+			is_subject = yes
+			overlord = { is_same_empire = from }
+		}
+	}
+}
+
+cb_take_throne = {
+	show_in_diplomacy = yes
+	show_notification = no
+
+	potential = {
+		merg_is_default_empire = yes
+		exists = from
+		NOR = {
+			is_gestalt = yes
+			is_in_federation_with = from
+		}
+	}
+
+	is_valid = {
+		merg_is_default_empire = yes
+		has_origin = origin_khan_successor
+		from = { merg_is_default_empire = yes }
+		from = { has_relic = r_khans_throne }
+		NOT = { is_overlord_to = from }
+		NAND = {
+			is_subject = yes
+			overlord = { is_same_empire = from }
+		}
+	}
+}

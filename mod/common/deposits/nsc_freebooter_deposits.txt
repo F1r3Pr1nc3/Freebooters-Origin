@@ -1,0 +1,14 @@
+d_nsc_freebooter_habitat = {
+	# icon = d_nsc_freebooter_home
+	is_for_colonizable = yes
+	category = deposit_cat_rare
+	planet_modifier = {
+		planet_jobs_alloys_produces_mult = 0.1
+		planet_jobs_upkeep_mult = 0.1
+		planet_max_buildings_add = 6
+	}
+	potential = {
+		is_planet_class = pc_habitat # always = no #
+	}
+	drop_weight = { weight = 0 }
+}
