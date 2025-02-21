@@ -9,7 +9,7 @@ col_capital_nsc_freebooter = {
 		owner = { is_freebooter_empire = yes }
 	}
 	planet_modifier = {
-		planet_metallurgists_alloys_produces_mult = 0.25 # Increase this if removing special disctrict
+		planet_metallurgists_alloys_produces_mult = 0.25
 		planet_metallurgists_upkeep_mult = 0.25
 		planet_amenities_add = 10
 		planet_max_buildings_add = 6
@@ -263,13 +263,13 @@ col_habitat_nsc_freebooter_foundry = {
 	}
 	custom_tooltip = col_habitat_foundry_custom
 	planet_modifier = {
-		planet_metallurgists_alloys_produces_mult = 0.1 # Increase this if removing special disctrict
+		planet_metallurgists_alloys_produces_mult = 0.2 # Lower this if enable special disctrict
 		planet_districts_hab_foundry_cost_mult = -0.2
 		planet_districts_hab_foundry_upkeep_mult = -0.2
 		planet_building_foundry_1_build_speed_mult = 0.25
 		planet_metallurgists_upkeep_mult = -0.2
-		# planet_district_hab_industrial_build_speed_mult = 0.25
-		planet_district_nsc_freebooter_hab_foundry_build_speed_mult = 0.25
+		planet_district_hab_industrial_build_speed_mult = 0.25
+		# planet_district_nsc_freebooter_hab_foundry_build_speed_mult = 0.25 # Enable this if special district is present
 	}
 	triggered_planet_modifier = {
 		potential = {
@@ -341,13 +341,13 @@ col_habitat_nsc_freebooter_factory = {
 	}
 	custom_tooltip = col_habitat_factory_custom
 	planet_modifier = {
-		planet_metallurgists_consumer_goods_produces_mult = 0.1  # Increase this if removing special disctrict
+		planet_metallurgists_consumer_goods_produces_mult = 0.2 # Lower this if enable special disctrict
 		planet_building_factory_1_build_speed_mult = 0.25
-		# planet_district_hab_industrial_build_speed_mult = 0.25
+		planet_district_hab_industrial_build_speed_mult = 0.25
 		planet_artisans_upkeep_mult = -0.2
 		# planet_districts_hab_factory_cost_mult = -0.2
 		# planet_districts_hab_factory_upkeep_mult = -0.2
-		planet_district_nsc_freebooter_hab_factory_build_speed_mult = 0.25
+		# planet_district_nsc_freebooter_hab_factory_build_speed_mult = 0.25 # Enable this if special district is present
 	}
 	triggered_planet_modifier = {
 		potential = {

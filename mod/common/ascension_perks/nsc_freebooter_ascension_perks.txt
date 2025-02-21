@@ -11,6 +11,25 @@ ap_nsc_freebooter_wrath_of_khan = {
 		}
 		exists = ruler
 		exists = capital_scope
+		custom_tooltip = {
+			fail_text = "requires_shipyard"
+			OR = {
+				any_owned_starbase = {
+					has_starbase_size >= starbase_starfortress
+					OR = {
+						has_starbase_building = colossus_yards
+						# has_starbase_module = shipyard
+						count_starbase_modules = { type = shipyard count > 1 }
+					}
+				}
+				any_owned_megastructure = {
+					OR = {
+						is_megastructure_type = mega_shipyard_1
+						is_megastructure_type = mega_shipyard_restored
+					}
+				}
+			}
+		}
 	}
 
 	on_enabled = {
@@ -20,7 +39,6 @@ ap_nsc_freebooter_wrath_of_khan = {
 		custom_tooltip = "ap_nsc_freebooter_wrath_of_khan_tooltip_4"
 		hidden_effect = {
 			country_event = { id = nsc_freebooter.5 }
-			enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT" location = root.capital_scope }
 			random_list = {
 				10 = { country_event = { id = nsc_freebooter.21 random = 360 days = 360 } }
 				10 = { country_event = { id = nsc_freebooter.21 random = 360 days = 720 } }
@@ -46,7 +64,7 @@ ap_nsc_freebooter_wrath_of_khan = {
 	}
 
 	ai_weight = {
-		factor = 0
+		factor = 10
 	}
 }
 ap_nsc_freebooter_pirate_raider = {
@@ -66,7 +84,7 @@ ap_nsc_freebooter_pirate_raider = {
 		custom_tooltip = "ap_nsc_freebooter_pirate_raider_tooltip_2"
 	}
 
-	# ai_weight = {
-	# 	factor = 0
-	# }
+	ai_weight = {
+		factor = 10
+	}
 }

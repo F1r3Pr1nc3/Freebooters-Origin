@@ -62,19 +62,24 @@ special_project = {
 	on_success = {
 		ship_event = { id = nsc_freebooter.41 }
 	}
-
+	# this = country
+	# from = project scope. Might not exist!
+	# fromfrom = location scope, if set
 	on_fail = {
 		# destroy_ship = fromfrom
-		fromfrom = { enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT location = this owner = owner } }
+		fromfrom = { enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT owner = prev location = this } }
 		every_playable_country = {
 			limit = {
 				root.solar_system = {
 					is_surveyed = { who = prev status = yes }
 				}
-				NOT = { has_special_project = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT }
+				NOR = {
+					is_same_empire = prev
+					has_special_project = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT
+				}
 			}
 			fromfrom = {
-				enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT location = this owner = prev }
+				enable_special_project = { name = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT owner = prev location = this  }
 			}
 		}
 	}

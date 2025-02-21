@@ -2,7 +2,7 @@
 @hab_maintenance = 2
 @low_hab_maintenance = 0.2
 @hab_time = 240
-# TODO overwrite vanilla hab districts!?
+# Replaced with vanllia district_hab_housing
 # district_nsc_freebooter_hab_housing = {
 # 	base_buildtime = 360
 # 	is_capped_by_modifier = no
@@ -53,7 +53,7 @@
 # 		script = districts/habitat_housing_job_swaps
 # 	}
 # }
-
+# Replaced with vanllia district_hab_industrial
 # district_nsc_freebooter_hab_foundry = {
 # 	base_buildtime = @hab_time
 # 	is_capped_by_modifier = no
@@ -233,7 +233,7 @@ district_nsc_freebooter_hab_mining = {
 		}
 	}
 }
-
+# Replaced with vanllia district_hab_industrial
 # district_nsc_freebooter_hab_factory = {
 # 	base_buildtime = @hab_time
 # 	is_capped_by_modifier = no
@@ -456,8 +456,7 @@ district_nsc_freebooter_hab_bastion = {
 	}
 	conversion_ratio = 1
 	convert_to = {
-		district_hab_housing
-		# district_nsc_freebooter_hab_housing
+		district_hab_housing # district_nsc_freebooter_hab_housing
 	}
 	resources = {
 		category = planet_districts_hab_bastion

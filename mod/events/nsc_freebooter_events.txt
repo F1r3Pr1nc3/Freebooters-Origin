@@ -42,8 +42,9 @@ planet_event = {
 		add_building = building_foundry_1
 		while = { count = 2
 			# add_district = { district_type = district_nsc_freebooter_hab_housing ignore_cap = yes }
-			# add_district = { district_type = district_hab_housing ignore_cap = yes }
-			add_district = { district_type = district_nsc_freebooter_hab_foundry ignore_cap = yes }
+			add_district = { district_type = district_hab_housing ignore_cap = yes }
+			# add_district = { district_type = district_nsc_freebooter_hab_foundry ignore_cap = yes } Disabled for industrial
+			add_district = { district_type = district_hab_industrial ignore_cap = yes }
 		}
 		if = {
 			limit = { owner = { is_lithoid_empire = no } }
@@ -57,7 +58,8 @@ planet_event = {
 		}
 		if = {
 			limit = { owner = { is_gestalt = no } }
-			add_district = { district_type = district_nsc_freebooter_hab_factory ignore_cap = yes }
+			# add_district = { district_type = district_nsc_freebooter_hab_factory ignore_cap = yes } Disabled for industrial
+			add_district = { district_type = district_hab_industrial ignore_cap = yes }
 		}
 		# add_district_and_planet_size_if_needed_effect = { district = district_ }
 		if = {
@@ -99,13 +101,11 @@ country_event = {
 			remove_district = district_farming
 			remove_district = district_generator
 			remove_district = district_hab_mining
-			remove_district = district_hab_industrial
-			remove_district = district_hab_housing
+			# remove_district = district_hab_industrial
 			# remove_district = district_hab_science # Added later
 			# remove_district = district_hab_energy # Added later
 			set_planet_flag = toxic_knights_habitat
-			add_district = { district_type = district_nsc_freebooter_hab_housing ignore_cap = yes }
-			add_district = { district_type = district_nsc_freebooter_hab_housing ignore_cap = yes }
+			add_district = district_hab_housing
 			solar_system = {
 				every_system_planet = {
 					limit = {
@@ -553,6 +553,50 @@ country_event = {
 		## "Civil War" Starts paragon_origin_reformists_struggle
 		set_country_flag = paragon_origin_purges
 		country_event = { id = nsc_freebooter.5062 days = 14 }
+		# 'NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT' special project start
+		if = {
+			limit = {
+				any_owned_starbase = {
+					has_starbase_size >= starbase_starfortress
+					OR = {
+						has_starbase_building = colossus_yards
+						count_starbase_modules = { type = shipyard count > 1 }
+					}
+				}
+			}
+			random_owned_starbase = {
+				limit = {
+					has_starbase_size >= starbase_starfortress
+					OR = {
+						has_starbase_building = colossus_yards
+						count_starbase_modules = { type = shipyard count > 1 }
+					}
+				}
+				enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT" owner = root location = this }
+			}
+		}
+		else_if = {
+			limit = {
+				any_owned_megastructure = {
+					OR = {
+						is_megastructure_type = mega_shipyard_1
+						is_megastructure_type = mega_shipyard_restored
+					}
+				}
+			}
+			random_owned_megastructure = {
+				limit = {
+					OR = {
+						is_megastructure_type = mega_shipyard_1
+						is_megastructure_type = mega_shipyard_restored
+					}
+				}
+				enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT" owner = root location = this }
+			}
+		}
+		else = {
+			capital_scope = { enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT" owner = root location = this } }
+		}
 	}
 }
 
@@ -3978,7 +4022,7 @@ ship_event = {
 	is_triggered_only = yes
 	trigger = {
 		is_ship_size = nsc_freebooter_flagship
-		is_disabled = yes
+		# is_disabled = yes
 		owner = {
 			NOR = {
 				has_active_event = { nsc_freebooter.40 }
@@ -4015,7 +4059,9 @@ ship_event = {
 					rare_crystals = -150
 				}
 			}
-			enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_REPAIR_PROJECT" location = this owner = owner }
+			fleet = {
+				enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_REPAIR_PROJECT" location = this owner = owner }
+			}
 		}
 		ai_chance = { base = 10 }
 	}
@@ -4165,43 +4211,40 @@ ship_event = {
 	show_sound = event_construction
 	location = fromfrom
 	is_triggered_only = yes
-	trigger = {
-		exists = owner
-		owner = {
-			NOT = { has_active_event = { nsc_freebooter.41 } }
-		}
-	}
+	# trigger = {
+	# 	exists = owner
+	# 	owner = {
+	# 		NOT = { has_active_event = { nsc_freebooter.41 } }
+	# 	}
+	# }
 	immediate = {
-		fromfrom = {
+		fromfrom.fleet = {
 			set_owner = root.owner
-			repair_percentage = 0.25
-			owner = { remove_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened }
-			set_disabled = no
-			fleet = {
-				set_owner = root.owner
-				every_owned_ship = { set_disabled = no }
-				if = {
-					limit = {
-						owner = { has_country_flag = nsc_freebooter_khan_flagship_owner }
-						NAND = {
-							exists = leader
-							leader = { has_leader_flag = great_khan }
-						}
-					}
-					root.owner = {
-						if = {
-							limit = { any_owned_leader = { leader_class = commander has_leader_flag = great_khan } }
-							random_owned_leader = {
-								limit = { leader_class = commander has_leader_flag = great_khan }
-								prevprev = { assign_leader = prev }
-							}
-						}
-						else = { create_khan_dummy = yes }
+			if = {
+				limit = {
+					owner = { has_country_flag = nsc_freebooter_khan_flagship_owner }
+					NAND = {
+						exists = leader
+						leader = { has_leader_flag = great_khan }
 					}
 				}
-				set_event_locked = no
+				root.owner = {
+					if = {
+						limit = { any_owned_leader = { leader_class = commander has_leader_flag = great_khan } }
+						random_owned_leader = {
+							limit = { leader_class = commander has_leader_flag = great_khan }
+							prevprev = { assign_leader = prev }
+						}
+					}
+					else = { create_khan_dummy = yes }
+				}
 			}
+			repair_percentage = 0.25
+			repair_armor_percentage = 0.1
+			every_owned_ship = { set_disabled = no }
+			set_event_locked = no
 		}
+		owner = { remove_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened }
 	}
 	option = { name = nsc_freebooter.41.a }
 }
