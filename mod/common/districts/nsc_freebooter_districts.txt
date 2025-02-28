@@ -113,6 +113,7 @@ district_nsc_freebooter_hab_mining = {
 		has_owner = yes
 		owner = {
 			is_lithoid_empire = yes
+			is_freebooter_empire = yes
 		}
 		uses_district_set = habitat
 	}
@@ -309,6 +310,7 @@ district_nsc_freebooter_hab_farming = {
 		has_owner = yes
 		owner = {
 			is_lithoid_empire = no
+			is_freebooter_empire = yes
 		}
 		uses_district_set = habitat
 	}
