@@ -40,7 +40,11 @@ nsc_freebooter_habitat = {
 				is_ship_size = constructor
 				has_fleet_order = build_megastructure_fleet_order
 				exists = orbit
-				orbit = { is_star = no }
+				orbit = {
+					is_scope_valid = yes
+					is_scope_type = planet # Since v3.14 log gives also astral_rift!?
+					is_star = no
+				}
 			}
 			count = 0
 		}
@@ -207,7 +211,11 @@ nsc_freebooter_habitat = {
 					is_ship_size = constructor
 					has_fleet_order = build_megastructure_fleet_order
 					exists = orbit
-					orbit = { is_star = no }
+					orbit = {
+						is_scope_valid = yes
+						is_scope_type = planet # Since v3.14 log gives also astral_rift!?
+						is_star = no
+					}
 				}
 			}
 			random_fleet_in_system = { # One is enough ;-)
@@ -215,7 +223,11 @@ nsc_freebooter_habitat = {
 					is_ship_size = constructor
 					has_fleet_order = build_megastructure_fleet_order
 					exists = orbit
-					orbit = { is_star = no }
+					orbit = {
+						is_scope_valid = yes
+						is_scope_type = planet # Since v3.14 log gives also astral_rift!?
+						is_star = no
+					}
 				}
 				clear_orders = yes
 				clear_fleet_actions = this

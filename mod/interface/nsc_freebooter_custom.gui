@@ -1,8 +1,7 @@
 guiTypes = {
-	#edict_nsc_freebooter_leader_making
 	@hidden_ui_elements_position = -10000
-
 	containerWindowType = {
+		# name = "edict_nsc_freebooter_leader_making"
 		####################### Hidden UI #########################
 		iconType = { name = "empire_header_line" quadTextureSprite = "GFX_line_long_caravaneer" position = { x = @hidden_ui_elements_position y = @hidden_ui_elements_position } alwaysTransparent = yes }
 		buttonType = { name = "focus_button" position = { x = @hidden_ui_elements_position y = @hidden_ui_elements_position } orientation = "UPPER_RIGHT" spriteType = "GFX_fleetview_focus" buttonFont = "cg_16b" shortcut = "q" }
@@ -584,12 +583,12 @@ guiTypes = {
 					quadTextureSprite = "GFX_leader_trait_restrained"
 					effect = "effect_add_nsc_freebooter_leader_trait_general_3"
 				}
-				# effectbuttonType = {
-				# 	name = "add_nsc_freebooter_leader_trait_general_4"
-				# 	position = { x = 120 y = 15 }
-				# 	quadTextureSprite = "GFX_leader_trait_charismatic"
-				# 	effect = "effect_add_nsc_freebooter_leader_trait_general_4"
-				# }
+				effectbuttonType = {
+					name = "add_nsc_freebooter_leader_trait_general_4"
+					position = { x = 120 y = 15 }
+					quadTextureSprite = "GFX_leader_trait_crusader"
+					effect = "effect_add_nsc_freebooter_leader_trait_general_4"
+				}
 				effectbuttonType = {
 					name = "add_nsc_freebooter_leader_trait_general_5"
 					position = { x = 155 y = 15 }
@@ -599,7 +598,7 @@ guiTypes = {
 				effectbuttonType = {
 					name = "add_nsc_freebooter_leader_trait_general_6"
 					position = { x = 190 y = 15 }
-					quadTextureSprite = "GFX_leader_trait_glory_seeker"
+					quadTextureSprite = "GFX_leader_trait_heavy_hitter"
 					effect = "effect_add_nsc_freebooter_leader_trait_general_6"
 				}
 				effectbuttonType = {
@@ -614,8 +613,12 @@ guiTypes = {
 					quadTextureSprite = "GFX_leader_trait_mercenary_warrior"
 					effect = "effect_add_nsc_freebooter_leader_trait_general_8"
 				}
-
-
+				effectbuttonType = {
+					name = "add_nsc_freebooter_leader_trait_general_9"
+					position = { x = 295 y = 15 }
+					quadTextureSprite = "GFX_leader_trait_dreaded"
+					effect = "effect_add_nsc_freebooter_leader_trait_general_9"
+				}
 			}
 		}
 

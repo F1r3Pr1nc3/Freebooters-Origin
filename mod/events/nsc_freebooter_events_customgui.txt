@@ -1,10 +1,13 @@
+#
 namespace = nsc_freebooter_customgui
+# From Edict nsc_freebooter_leader_making
 country_event = {
 	id = nsc_freebooter_customgui.1
-	title = "nsc_freebooter_customgui.1.name"
-	desc = "nsc_freebooter_customgui.1.desc"
-	is_triggered_only = yes
+	title = BLANK_STRING # "nsc_freebooter_customgui.1.name"
+	desc = BLANK_STRING # "nsc_freebooter_customgui.1.desc"
 	diplomatic = yes
+	# hide_window = yes
+	is_triggered_only = yes
 	immediate = {
 		if = {
 			limit = { NOT = { has_country_flag = nsc_freebooter_leader_making_trait_points_set } }
@@ -50,10 +53,12 @@ country_event = {
 			}
 			set_country_flag = nsc_freebooter_leader_making_set_skill_level_2_granted
 		}
-		run_in_ai_mode = yes # Without this immediate is not invoked when event runs in a special mode that allows AI to collect trade data
+		run_in_ai_mode = yes
 	}
 	custom_gui = nsc_freebooter_leader_making
-	option = { name = nsc_freebooter_customgui.1.a }
+	option = {
+		name = OK # nsc_freebooter_customgui.1.a
+	}
 }
 
 country_event = {

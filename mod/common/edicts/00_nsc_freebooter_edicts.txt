@@ -1,10 +1,7 @@
 nsc_freebooter_leader_making = {
-	length = -1 # Infinite length
+	length = -1	# Infinite length
 	icon = "GFX_edict_type_policy"
-	resources = {
-		category = campaigns
-	}
-
+	resources = { category = campaigns }
 	effect = {
 		hidden_effect = {
 			set_country_flag = nsc_freebooter_leader_making_window_opened
@@ -12,32 +9,21 @@ nsc_freebooter_leader_making = {
 		}
 		custom_tooltip = nsc_freebooter_leader_making_tooltip
 	}
-
-	potential = {
-		is_freebooter_empire = yes has_ascension_perk = ap_nsc_freebooter_wrath_of_khan
+	allow = {
+		hidden_trigger = {
+			NOT = { has_country_flag = nsc_freebooter_leader_making_window_opened }
+		}
 	}
-
-	ai_weight = {
-		weight = 0
-	}
+	potential = { is_freebooter_empire = yes has_ascension_perk = ap_nsc_freebooter_wrath_of_khan }
+	ai_weight = { weight = 0 }
 }
+
 nsc_freebooter_pirate_raiding_control = {
-	edict_cap_usage = 0 # You can turn it on or off without any trouble # yay!
-	length = -1 # Infinite length
+	edict_cap_usage = 0	# You can turn it on or off without any trouble # yay!
+	length = -1	# Infinite length
 	icon = "GFX_edict_type_policy"
-	resources = {
-		category = campaigns
-	}
-
-	effect = {
-		custom_tooltip = "nsc_freebooter_pirate_raiding_control_tooltip"
-	}
-
-	potential = {
-		is_freebooter_empire = yes has_ascension_perk = ap_nsc_freebooter_pirate_raider
-	}
-
-	ai_weight = {
-		weight = 0
-	}
+	resources = { category = campaigns }
+	effect = { custom_tooltip = "nsc_freebooter_pirate_raiding_control_tooltip" }
+	potential = { is_freebooter_empire = yes has_ascension_perk = ap_nsc_freebooter_pirate_raider }
+	ai_weight = { weight = 0 }
 }

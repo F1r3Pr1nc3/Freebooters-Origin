@@ -40,8 +40,8 @@ nsc_freebooter_flagship = {
 	num_target_locators = 1
 	icon = ship_size_military_16 # nsc_ship_size_military_18 TODO?
 	combat_disengage_chance = 0
-	default_behavior = carrier
-	is_designable = no
+	default_behavior = artillery # Carrier has strange behavior
+	is_designable = yes # No v3.14
 
 	class = shipclass_military
 	construction_type = starbase_shipyard

@@ -1,5 +1,4 @@
 ﻿l_english:
-### 디시인사이드 스텔라리스 갤러리 '어ㅅㅂ' 제작 ###
 ### ETC ###
  nsc_freebooter_forced_border_open_no_rival_empire_modifier: "Tell me if you saw this modifier, as it shouldn't be seen"
 ### Message Types ###
@@ -25,6 +24,7 @@
  pc_nsc_freebooter_habitat: "$trait_nsc_freebooter$' $col_habitat$"
  pc_nsc_freebooter_habitat_desc: "$pc_habitat_desc$"
  pc_nsc_freebooter_habitat_adj: "den of pirates"
+ requires_larger_shipyard: "§RRequires a larger §Y$sm_shipyard$§!.§!"
 
 ### $DISTRICTS$ ###
  district_nsc_freebooter_hab_housing: "$district_hab_housing$"
@@ -37,7 +37,7 @@
  # district_nsc_freebooter_hab_mining_desc: "$district_hab_mining_desc$"
  district_nsc_freebooter_hab_mining_plural: "$district_hab_mining_plural$"
  district_nsc_freebooter_hab_farming: "$district_farming$"
- # district_nsc_freebooter_hab_farming_desc: "$district_farming_desc$"
+ district_nsc_freebooter_hab_farming_desc: "$district_farming_desc$"
  district_nsc_freebooter_hab_farming_plural: "$district_farming_plural$"
  district_nsc_freebooter_hab_factory: "$graygoo_factory$ $DISTRICT$"
  district_nsc_freebooter_hab_factory_desc: "Workshops filled with artisans and civilian industries line the stacked streets of this district."
@@ -135,7 +135,7 @@
  ap_nsc_freebooter_pirate_raider_desc: "Time to organise ourselves into more than just a well-armed rabble."
  ap_nsc_freebooter_pirate_raider_tooltip: "§HUnlocks Feature:§! §YPirate Raid§!\n- Allows a Fleet to plunder resources in both §YPeace and Wartime§!.\n- Allows a Fleet to abduct pops in §YWartime§!.\n- Move your fleet to the orbit of the target planet to plunder or abduct.\n- Plundering or Abducting will be initiated in every §Y1st day§! of the month, up to §Y10§! times.\n- Plundering or Abducting will §Rharm§! diplomatic relationships with the Victim Empire."
  ap_nsc_freebooter_pirate_raider_tooltip_2: "§HUnlocks Edict:§! §Y$edict_nsc_freebooter_pirate_raiding_control$§!\n§HUnlocks War Goal:§! §Y$war_goal_wg_nsc_freebooter_forced_border_open$§!"
- r_khans_throne:1 "Great Khan's Throne"
+ # r_khans_throne:1 "Great Khan's Throne"
 
 ### Casus Bellies / War Goals ###
  casus_belli_cb_nsc_freebooter_pirate_raider: "$ap_nsc_freebooter_pirate_raider$"
@@ -214,13 +214,13 @@
 ### UI Modifiers ###
  planet_districts_hab_foundry: "$district_nsc_freebooter_hab_foundry$"
  planet_districts_hab_factory: "$district_nsc_freebooter_hab_factory$"
- planet_districts_hab_mining: "$district_nsc_freebooter_hab_mining$"
+ # planet_districts_hab_mining: "$district_nsc_freebooter_hab_mining$"
  planet_districts_hab_farming: "$district_nsc_freebooter_hab_farming$"
  planet_districts_hab_bastion: "$district_nsc_freebooter_hab_bastion$"
 
  mod_planet_districts_hab_foundry_cost_mult: "$district_nsc_freebooter_hab_foundry$ Cost"
  mod_planet_districts_hab_foundry_upkeep_mult: "$district_nsc_freebooter_hab_foundry$ Upkeep"
- mod_planet_districts_hab_mining_cost_mult: "$district_nsc_freebooter_hab_mining$ Cost"
+ # mod_planet_districts_hab_mining_cost_mult: "$district_nsc_freebooter_hab_mining$ Cost"
  mod_planet_districts_hab_mining_upkeep_mult: "$district_nsc_freebooter_hab_mining$ Upkeep"
  mod_planet_districts_hab_farming_cost_mult: "$district_nsc_freebooter_hab_farming$ Cost"
  mod_planet_districts_hab_farming_upkeep_mult: "$district_nsc_freebooter_hab_farming$ Upkeep"

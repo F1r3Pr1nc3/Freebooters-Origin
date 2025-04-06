@@ -1,4 +1,5 @@
 clear_nsc_freebooter_leader_making_values = {
+	optimize_memory
 	if = {
 		limit = {
 			OR = {
@@ -120,11 +121,12 @@ clear_nsc_freebooter_leader_making_values = {
 				nsc_freebooter_leader_trait_general_1 = { remove_country_flag = nsc_freebooter_leader_trait_general_1 }
 				nsc_freebooter_leader_trait_general_2 = { remove_country_flag = nsc_freebooter_leader_trait_general_2 }
 				nsc_freebooter_leader_trait_general_3 = { remove_country_flag = nsc_freebooter_leader_trait_general_3 }
-				# nsc_freebooter_leader_trait_general_4 = { remove_country_flag = nsc_freebooter_leader_trait_general_4 }
+				nsc_freebooter_leader_trait_general_4 = { remove_country_flag = nsc_freebooter_leader_trait_general_4 }
 				nsc_freebooter_leader_trait_general_5 = { remove_country_flag = nsc_freebooter_leader_trait_general_5 }
 				nsc_freebooter_leader_trait_general_6 = { remove_country_flag = nsc_freebooter_leader_trait_general_6 }
 				nsc_freebooter_leader_trait_general_7 = { remove_country_flag = nsc_freebooter_leader_trait_general_7 }
 				nsc_freebooter_leader_trait_general_8 = { remove_country_flag = nsc_freebooter_leader_trait_general_8 }
+				nsc_freebooter_leader_trait_general_9 = { remove_country_flag = nsc_freebooter_leader_trait_general_9 }
 			}
 		}
 		remove_country_flag = nsc_freebooter_leader_class_set_to_general

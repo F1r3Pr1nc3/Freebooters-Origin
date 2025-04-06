@@ -12,19 +12,20 @@ ap_nsc_freebooter_wrath_of_khan = {
 		exists = ruler
 		exists = capital_scope
 		custom_tooltip = {
-			fail_text = "requires_shipyard"
+			fail_text = "requires_larger_shipyard"
 			OR = {
 				any_owned_starbase = {
 					has_starbase_size >= starbase_starfortress
 					OR = {
 						has_starbase_building = colossus_yards
-						# has_starbase_module = shipyard
 						count_starbase_modules = { type = shipyard count > 1 }
 					}
 				}
 				any_owned_megastructure = {
 					OR = {
 						is_megastructure_type = mega_shipyard_1
+						is_megastructure_type = mega_shipyard_2
+						is_megastructure_type = mega_shipyard_3
 						is_megastructure_type = mega_shipyard_restored
 					}
 				}

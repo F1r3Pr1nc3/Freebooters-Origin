@@ -1,10 +1,12 @@
 has_nsc_freebooters_active = {
+	optimize_memory
 	always = yes
 }
 
 # To compare factions to a freebooter lifestyle or origin, we'll look for factions that emphasize themes like piracy, nomadic existence, scavenging, and a generally adventurous or lawless way of life.
 # Each of these factions could have unique origins and playstyles that align with the freebooter theme, making them a great fit for players looking to experience a more lawless and adventurous side of Stellaris.
 is_freebooter_empire = {
+	optimize_memory
 	OR = {
 		has_origin = origin_nsc_freebooter
 		has_origin = origin_nsc_freebooter_federations
@@ -12,9 +14,7 @@ is_freebooter_empire = {
 		has_origin = origin_treasure_hunters
 		inline_script = { # All That is Grimdark
 			script = merger_of_rules/toggled_code
-			code = "
-			has_origin = origin_barbarichorde
-			"
+			code = " has_origin = origin_barbarichorde "
 			toggle = @has_allthatisgrimdark_mod
 		}
 		AND = { has_origin = origin_legendary_leader_death has_civic = nsc_freebooter_civic_great_khans_vision }
@@ -28,6 +28,7 @@ is_freebooter_empire = {
 }
 # Vanilla overwrite!!
 has_void_dweller_origin = {
+	optimize_memory
 	OR = {
 		has_origin = origin_void_dwellers
 		has_origin = origin_void_machines
@@ -45,4 +46,14 @@ has_void_dweller_origin = {
 has_not_federations_dlc = { # Necessary for prescripted empires, which do not support arguments
 	optimize_memory
 	has_federations_dlc = no
+}
+
+should_use_increased_treasure_trove_drops = {
+	optimize_memory
+	OR = {
+		has_origin = origin_nsc_freebooter
+		has_origin = origin_nsc_freebooter_federations
+		has_origin = origin_treasure_hunters
+		has_all_treasure_troves_specimens = yes
+	}
 }

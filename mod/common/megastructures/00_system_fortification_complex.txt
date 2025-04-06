@@ -59,7 +59,11 @@ system_fortification_complex = {
 				# Bug workaround # (not allow orbitals and habitats)
 				NAND = {
 					exists = orbit
-					orbit = { is_scope_type = planet merg_is_habitat = yes }
+					orbit = {
+						is_scope_valid = yes
+						is_scope_type = planet
+						merg_is_habitat = yes
+					}
 				}
 				has_orbital_station = no
 			}

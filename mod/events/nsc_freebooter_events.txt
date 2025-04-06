@@ -82,8 +82,7 @@ country_event = {
 		exists = capital_scope
 		capital_scope = { merg_is_habitat = yes }
 	}
-	immediate = {
-		# set_global_flag = has_nsc_freebooters_mod
+	immediate = {	# set_global_flag = has_nsc_freebooters_mod
 		owner_species = { save_event_target_as = freebooter_species }
 		set_spawn_system_batch = begin
 		capital_scope = {
@@ -93,7 +92,7 @@ country_event = {
 				set_planet_size = 12
 			}
 			if = {
-				limit = { NOT = { is_planet_class = pc_habitat } }
+				limit = { merg_is_habitat = no }
 				log = "Change Freebooter Capital Habitat"
 				change_pc = pc_habitat
 			}
@@ -152,6 +151,7 @@ country_event = {
 					max_steps = 3
 					random_system_planet = {
 						limit = { is_colonizable = yes is_colony = no }
+						save_event_target_as = target_planet
 						# change_pc = "pc_tropical"
 						# select_pre_ftl_origin = yes
 						event_target:freebooter_species = {
@@ -180,22 +180,127 @@ country_event = {
 									# trait = "trait_limited_regeneration"
 									# trait = "trait_deviants
 								}
+								effect = { save_event_target_as = marauder_neighbor_species }
 							}
 						}
-
 						create_late_pre_ftl_empire = yes
-						setup_pre_ftl_planet = yes
-						pre_ftl_clean_up_effect = yes
-						change_colony_foundation_date = -461
-						while = { count = 3
-							create_army = {
-								owner = last_created_country
-								type = primitive_additional_army
-								species = last_created_species
+						solar_system = {	# spawn_megastructure = { type = "habitat_central_complex" planet = prev }
+							spawn_planet = {
+								class = "pc_habitat"
+								location = event_target:target_planet
+								orbit_location = yes
+								orbit_angle_offset = 135
+								orbit_distance_offset = 9.899
+								size = 6
+								has_ring = no
+								# deposit_blockers = none
+								flags = { megastructure habitat energy_habitat habitat_level_1 }
+								init_effect = {
+									save_event_target_as = target_habitat
+									set_name = {
+										key = marauder.706.name # HABITAT_PLANET_NAME
+										variable_string = "[marauder_neighbor_species.GetName]"
+									}
+									set_planet_entity = { entity = "habitat_phase_03_entity" }
+									set_surveyed = { surveyed = yes surveyor = last_created_country }
+									set_all_comms_surveyed = yes
+								}
+							}
+							remove_star_flag = neighbor_t1_first_colony
+							create_fleet = {
+								name = "NAME_Ransomeer_Base"
+								effect = {
+									set_owner = last_created_country
+									create_ship = {
+										name = random
+										design = "NAME_Pirate_Nest"
+										graphical_culture = "pirate_01"
+									}
+									set_location = event_target:target_planet
+								}
+							}
+							create_fleet = {
+								effect = {
+									set_owner = last_created_country
+									create_ship = {
+										name = random
+										design = "NAME_Void_Dwelling"
+										graphical_culture = "pirate_01"
+									}
+									set_location = { target = event_target:target_planet distance = 10 angle = 0 }
+								}
 							}
 						}
-						# Somehow vanilla bug
-						last_created_country = {
+						event_target:target_habitat = {
+							setup_pre_ftl_planet = yes
+							pre_ftl_clean_up_effect = yes
+							change_colony_foundation_date = -461
+							event_target:target_planet = {
+								set_planet_flag = habitat@PREV
+								set_planet_flag = has_megastructure
+								create_fleet = {
+									effect = {
+										set_owner = last_created_country
+										create_ship = {
+											random_existing_design = major_orbital_generic
+											effect = {
+												set_disable_at_health = 0.05
+												set_name = major_orbital
+												# set_name = {
+												# 	key = TARGET_ORBITAL_NAME
+												# 	variable_string = "\\[FROM.from.planet.GetName]"
+												# }
+											}
+										}
+										save_event_target_as = target_orbital
+										fleet = {
+											set_location = { target = event_target:target_planet }
+										}
+										set_fleet_stance = passive
+										set_name = major_orbital_resource
+									}
+								}
+								set_habitat_planetary_features_effect = yes
+								if = {
+									limit = { event_target:target_planet = { has_deposit_for = shipclass_research_station } }
+									event_target:target_orbital = {
+										set_fleet_flag = science_orbital
+										set_name = major_orbital_science
+									}
+								}
+								if = {
+									limit = { event_target:target_planet = { has_orbital_mining_deposit = yes } }
+									event_target:target_orbital = {
+										set_fleet_flag = mining_orbital
+										set_name = major_orbital_mining
+									}
+								}
+								if = {
+									limit = { event_target:target_planet = { has_orbital_energy_deposit = yes } }
+									event_target:target_orbital = {
+										set_fleet_flag = energy_orbital
+										set_name = major_orbital_energy
+									}
+								}
+							}
+							while = { count = 3
+								random_planet_army = {
+									limit = { army_type = primitive_army }
+									remove_army = yes
+								}
+								create_army = {
+									owner = last_created_country
+									type = subterranean_postatomic_army
+									species = event_target:marauder_neighbor_species
+								}
+								create_army = {
+									owner = last_created_country
+									type = occupation_army
+									species = event_target:marauder_neighbor_species
+								}
+							}
+						}
+						last_created_country = {	# Somehow vanilla bug
 							if = {
 								limit = { is_homicidal = yes }
 								force_remove_civic = civic_fanatic_purifiers
@@ -204,12 +309,11 @@ country_event = {
 							}
 							set_origin = origin_nsc_freebooter
 							set_country_flag = early_space_age
-							country_event = { id = preftl.1099 days = 450 }
+							country_event = { id = preftl.1099 days = 1880 }
 						}
 					}
 				}
 				reroll_random = yes
-				# Vespid
 				closest_system = {
 					limit = {
 						has_star_flag = neighbor_t2_second_colony
@@ -219,6 +323,7 @@ country_event = {
 					max_steps = 4
 					random_system_planet = {
 						limit = { is_colonizable = yes is_colony = no }
+						save_event_target_as = target_planet
 						change_pc = "pc_desert"
 						# select_pre_ftl_origin = yes
 						event_target:freebooter_species = {
@@ -242,22 +347,128 @@ country_event = {
 									trait = "trait_enduring"								# Resilience and ability to withstand damage
 									trait = "trait_adaptive"								# +2 # Ability to survive in harsh environments
 								}
+								effect = { save_event_target_as = marauder_neighbor_species }
 							}
 						}
 						create_late_pre_ftl_empire = yes
-						setup_pre_ftl_planet = yes
-						pre_ftl_clean_up_effect = yes
-						change_colony_foundation_date = -1275
-						while = { count = 3
-							create_army = {
-								owner = last_created_country
-								type = primitive_additional_army
-								species = last_created_species
+						solar_system = {	# spawn_megastructure = { type = "habitat_central_complex" planet = prev
+							spawn_planet = {
+								class = "pc_habitat"
+								location = event_target:target_planet
+								orbit_location = yes
+								orbit_angle_offset = 135
+								orbit_distance_offset = 9.899
+								size = 6
+								has_ring = no
+								# deposit_blockers = none
+								flags = { megastructure habitat mining_habitat habitat_level_1 }
+								init_effect = {
+									save_event_target_as = target_habitat
+									set_name = {
+										key = marauder.706.name # HABITAT_PLANET_NAME
+										variable_string = "[marauder_neighbor_species.GetName]"
+									}
+									set_planet_entity = { entity = "habitat_phase_03_entity" }
+									set_surveyed = { surveyed = yes surveyor = last_created_country }
+									set_all_comms_surveyed = yes
+								}
+							}
+							create_fleet = {
+								name = "NAME_Wrecker_Base"
+								effect = {
+									set_owner = last_created_country
+									create_ship = {
+										name = random
+										design = "NAME_Pirate_Nest"
+										graphical_culture = "pirate_01"
+									}
+									set_location = event_target:target_planet
+								}
+							}
+							create_fleet = {
+								effect = {
+									set_owner = last_created_country
+									create_ship = {
+										name = random
+										design = "NAME_Void_Dwelling"
+										graphical_culture = "pirate_01"
+									}
+									set_location = { target = event_target:target_planet distance = 10 angle = 0 }
+								}
+							}
+							remove_star_flag = neighbor_t2_second_colony
+						}
+						event_target:target_habitat = {
+							setup_pre_ftl_planet = yes
+							pre_ftl_clean_up_effect = yes
+							change_colony_foundation_date = -1275
+							event_target:target_planet = {
+								set_planet_flag = habitat@PREV
+								set_planet_flag = has_megastructure
+								create_fleet = {
+									effect = {
+										set_owner = last_created_country
+										create_ship = {
+											random_existing_design = major_orbital_generic
+											effect = {
+												set_disable_at_health = 0.05
+												set_name = major_orbital
+												# set_name = {
+												# 	key = TARGET_ORBITAL_NAME
+												# 	variable_string = "\\[FROM.from.planet.GetName]"
+												# }
+											}
+										}
+										save_event_target_as = target_orbital
+										fleet = {
+											set_location = { target = event_target:target_planet }
+										}
+										set_fleet_stance = passive
+										set_name = major_orbital_resource
+									}
+								}
+								set_habitat_planetary_features_effect = yes
+								if = {
+									limit = { event_target:target_planet = { has_deposit_for = shipclass_research_station } }
+									event_target:target_orbital = {
+										set_fleet_flag = science_orbital
+										set_name = major_orbital_science
+									}
+								}
+								if = {
+									limit = { event_target:target_planet = { has_orbital_mining_deposit = yes } }
+									event_target:target_orbital = {
+										set_fleet_flag = mining_orbital
+										set_name = major_orbital_mining
+									}
+								}
+								if = {
+									limit = { event_target:target_planet = { has_orbital_energy_deposit = yes } }
+									event_target:target_orbital = {
+										set_fleet_flag = energy_orbital
+										set_name = major_orbital_energy
+									}
+								}
+							}
+							while = { count = 3
+								random_planet_army = {
+									limit = { army_type = primitive_army }
+									remove_army = yes
+								}
+								create_army = {
+									owner = last_created_country
+									type = subterranean_postatomic_army
+									species = event_target:marauder_neighbor_species
+								}
+								create_army = {
+									owner = last_created_country
+									type = occupation_army
+									species = event_target:marauder_neighbor_species
+								}
 							}
 						}
 					}
-					# Somehow vanilla bug
-					last_created_country = {
+					last_created_country = {	# Somehow vanilla bug
 						if = {
 							limit = { is_homicidal = yes }
 							force_remove_civic = civic_fanatic_purifiers
@@ -266,7 +477,7 @@ country_event = {
 						}
 						set_origin = origin_nsc_freebooter
 						set_country_flag = early_space_age
-						country_event = { id = preftl.1099 days = 540 }
+						country_event = { id = preftl.1099 days = 2560 }
 					}
 				}
 			}
@@ -275,8 +486,48 @@ country_event = {
 	}
 	after = {
 		if = {
-			limit = { has_grand_archive_dlc = yes }
-			owner = { set_origin = origin_treasure_hunters }
+			limit = {
+				is_ai = no
+				has_grand_archive_dlc = yes
+				count_playable_country = { count = 0
+					limit = { is_ai = no has_origin = origin_treasure_hunters }
+				}
+			}
+			add_relic = r_celestial_chart_0 # grand_archive.2220
+			country_event = { id = grand_archive.8000 days = 1 }
+		}
+
+		create_fleet = {
+			name = "NAME_Wrecker_Base"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					design = "NAME_Pirate_Nest"
+					graphical_culture = "pirate_01"
+				}
+				set_location = root.capital_scope
+			}
+		}
+		create_fleet = {
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					design = "NAME_Void_Dwelling"
+					graphical_culture = "pirate_01"
+				}
+				set_location = { target = root.capital_scope distance = 10 angle = 0 }
+			}
+		}
+		capital_scope = {
+			while = { count = 3
+				create_army = {
+					owner = last_created_country
+					type = occupation_army
+					species = event_target:freebooter_species
+				}
+			}
 		}
 	}
 }
@@ -393,8 +644,7 @@ country_event = {
 		exists = ruler
 		ruler = { has_leader_flag = paragon_origin_legendary_leader }
 	}
-	immediate = {
-		# Change to Imperial (option) name = paragon.5020.a custom_tooltip = paragon.5020.a.tt
+	immediate = {	# Change to Imperial (option) name = paragon.5020.a custom_tooltip = paragon.5020.a.tt
 		# set_origin = origin_legendary_leader_imperial
 		# shift_ethic = ethic_fanatic_egalitarian
 		change_government = { authority = auth_imperial remove_invalid_civics = yes }
@@ -480,15 +730,14 @@ country_event = {
 		start_situation = { type = paragon_origin_reformists_struggle }
 	}
 	after = {
-		hidden_effect = {
-			# set_origin = origin_legendary_leader_death
+		hidden_effect = {	# set_origin = origin_legendary_leader_death
 			set_variable = { which = paragon_origin_delusion_tier value = 0 }
 			add_modifier = { modifier = paragon_origin_rebel_player }
 			# paragon_origin_launch_rebelion = yes
 			# country_event = { id = paragon.5211 days = 15 random = 15 } # Notification Started the war
 			ordered_owned_planet = {
 				limit = {
-					num_pops > 10
+					num_sapient_pops > 10
 					planet_stability > 35
 					solar_system = { is_capital_system = no }					# NOT = { is_planet = prev.capital_scope }
 				}
@@ -578,19 +827,11 @@ country_event = {
 		else_if = {
 			limit = {
 				any_owned_megastructure = {
-					OR = {
-						is_megastructure_type = mega_shipyard_1
-						is_megastructure_type = mega_shipyard_restored
-					}
+					OR = { is_megastructure_type = mega_shipyard_1 is_megastructure_type = mega_shipyard_restored }
 				}
 			}
 			random_owned_megastructure = {
-				limit = {
-					OR = {
-						is_megastructure_type = mega_shipyard_1
-						is_megastructure_type = mega_shipyard_restored
-					}
-				}
+				limit = { OR = { is_megastructure_type = mega_shipyard_1 is_megastructure_type = mega_shipyard_restored } }
 				enable_special_project = { name = "NSC_FREEBOOTER_KHAN_SHIP_BUILD_PROJECT" owner = root location = this }
 			}
 		}
@@ -1301,8 +1542,7 @@ country_event = {
 				ruler = { has_trait = nsc_freebooter_leader_trait_ruler_great_khan }
 			}
 			if = {
-				limit = {
-					# And the player empire has at least one general
+				limit = {	# And the player empire has at least one general
 					any_owned_leader = {
 						leader_class = commander
 						NOR = { has_trait = nsc_freebooter_admiral_trait_great_khan has_trait = nsc_freebooter_admiral_trait_child_of_great_khan }
@@ -1311,8 +1551,7 @@ country_event = {
 				set_country_flag = nsc_freebooter_the_duel_event_already_triggered
 				country_event = { id = nsc_freebooter.22 }
 			}
-			else = {
-				# Recheck the condition again
+			else = {	# Recheck the condition again
 				country_event = { id = nsc_freebooter.21 random = 180 days = 180 }
 			}
 		}
@@ -1344,8 +1583,7 @@ country_event = {
 	auto_select = yes
 	force_open = yes
 	auto_opens = yes
-	immediate = {
-		# NSC_FREEBOOTER_THE_DUEL_EVENT_START_SETUP_EFFECT
+	immediate = {	# NSC_FREEBOOTER_THE_DUEL_EVENT_START_SETUP_EFFECT
 		set_variable = { which = nsc_freebooter_the_duel_evt_the_khan_hp_var value = 4 }		# Khan default hp
 		set_variable = { which = nsc_freebooter_the_duel_evt_the_opponent_hp_var value = 4 }		# Opponent default hp
 		ruler = {
@@ -1677,8 +1915,7 @@ country_event = {
 	auto_opens = yes
 	after = {
 		custom_tooltip = nsc_freebooter.26.tooltip
-		hidden_effect = {
-			# NSC_FREEBOOTER_THE_DUEL_EVENT_ROUND_2_RESULT_EFFECT
+		hidden_effect = {	# NSC_FREEBOOTER_THE_DUEL_EVENT_ROUND_2_RESULT_EFFECT
 			switch = { trigger = has_country_flag
 				# aggressive
 				nsc_freebooter_the_duel_evt_option_aggressive_random_1 = {
@@ -2081,8 +2318,7 @@ country_event = {
 		from = { has_trait = nsc_freebooter_leader_trait_ruler_great_khan }
 	}
 	immediate = {
-		if = {
-			# Kill the clone of the ruler
+		if = {	# Kill the clone of the ruler
 			limit = {
 				any_owned_leader = {
 					leader_class = commander
@@ -2097,8 +2333,7 @@ country_event = {
 				kill_leader = { show_notification = no }
 			}
 		}
-		else_if = {
-			# Kill the ruler if the clone died
+		else_if = {	# Kill the ruler if the clone died
 			limit = {
 				any_owned_leader = {
 					leader_class = official
@@ -2130,8 +2365,7 @@ country_event = {
 		is_war_leader = yes
 		exists = from
 	}
-	immediate = {
-		# log = "From = \\[From.GetName], fromfrom = \\[fromfrom.GetName]"
+	immediate = {	# log = "From = \\[From.GetName], fromfrom = \\[fromfrom.GetName]"
 		random_war = {
 			limit = {
 				is_war_participant = { who = root side = attackers }
@@ -2280,8 +2514,7 @@ event = {
 	trigger = {
 		any_playable_country = { is_freebooter_empire = yes }
 	}
-	immediate = {
-		# Just once?
+	immediate = {	# Just once?
 		random_playable_country = {
 			limit = {
 				is_freebooter_empire = yes
@@ -2299,8 +2532,7 @@ country_event = {
 	id = nsc_freebooter.3400
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = {
-		# merg_is_default_empire = yes
+	trigger = {	# merg_is_default_empire = yes
 		is_freebooter_empire = yes
 		has_ascension_perk = ap_nsc_freebooter_pirate_raider
 		has_edict = nsc_freebooter_pirate_raiding_control
@@ -2309,6 +2541,9 @@ country_event = {
 			is_civilian = no
 			exists = orbit
 			orbit = {
+				is_scope_valid = yes
+				is_scope_type = planet # Since v3.14 log gives also astral_rift!?
+				# has_owner = yes
 				is_colony = yes
 				NOR = {
 					is_owned_by = root
@@ -2327,15 +2562,15 @@ country_event = {
 		}
 	}
 	immediate = {
-		random_controlled_fleet = {
-			# Changed from 'every_fleet_in_system' to prevent the event to happen several times at once
+		random_controlled_fleet = {	# Changed from 'every_fleet_in_system' to prevent the event to happen several times at once
 			limit = {
 				is_mobile = yes
 				is_civilian = no
 				exists = orbit
-				orbit = {
-					# is_scope_type = planet
-					has_owner = yes
+				orbit = {	# is_scope_type = planet
+					is_scope_valid = yes
+					is_scope_type = planet # Since v3.14 log gives also astral_rift!?
+					# has_owner = yes
 					is_colony = yes
 					NOR = {
 						is_owned_by = root
@@ -2436,12 +2671,10 @@ planet_event = {
 		# 			orbit = { is_planet = root }
 		# 			owner = { has_ascension_perk = ap_nsc_freebooter_pirate_raider }
 		# 		}
-		from = {
-			# The owner empire (the freebooter empire) of the fleet, which is located in the orbit of the 'root' (the planet where is raided by the empire)
+		from = {	# The owner empire (the freebooter empire) of the fleet, which is located in the orbit of the 'root' (the planet where is raided by the empire)
 			add_intel = { who = root.owner amount = 1 }
 			root = {
-				owner = {
-					# The owner empire of the 'root' (the planet where is raided by the freebooter empire)
+				owner = {	# The owner empire of the 'root' (the planet where is raided by the freebooter empire)
 					add_opinion_modifier = {
 						who = prevprev						# Two steps back from the 'owner' so it's the freebooter empire
 						modifier = nsc_freebooter_opinion_they_raided_one_of_our_colony
@@ -2449,25 +2682,20 @@ planet_event = {
 				}
 				if = {
 					limit = { prev = { is_at_war_with = root.owner } }
-					random_owned_pop = {
-						# Abduct a pop # a 'random_owned_pop' who is living in the 'root' (the planet where is raided by the empire)
-						prevprev = {
-							# The freebooter empire
-							random_owned_planet = {
-								# Two steps back from the 'random_owned_planet' (one of the freebooter empire's planet) so it's 'random_owned_pop'
+					random_owned_pop = {	# Abduct a pop # a 'random_owned_pop' who is living in the 'root' (the planet where is raided by the empire)
+						prevprev = {	# The freebooter empire
+							random_owned_planet = {	# Two steps back from the 'random_owned_planet' (one of the freebooter empire's planet) so it's 'random_owned_pop'
 								limit = { free_jobs >= 1 }
 								create_pop = { species = prevprev }
 							}
-							if = {
-								# If every planet under the freebooter empire has NO free job available at this moment
+							if = {	# If every planet under the freebooter empire has NO free job available at this moment
 								limit = {
 									count_owned_planet = {
 										limit = { free_jobs >= 1 }
 										count = 0
 									}
 								}
-								capital_scope = {
-									# Two steps back from the 'capital_scope' (the freebooter empire's capital) so it's 'random_owned_pop'
+								capital_scope = {	# Two steps back from the 'capital_scope' (the freebooter empire's capital) so it's 'random_owned_pop'
 									create_pop = { species = prevprev }
 								}
 							}
@@ -2485,7 +2713,6 @@ planet_event = {
 							OR = {
 								colony_type = col_generator
 								colony_type = col_habitat_energy
-								colony_type = col_generator
 							}
 						}
 					}
@@ -2791,7 +3018,6 @@ planet_event = {
 							NOR = {
 								colony_type = col_generator
 								colony_type = col_habitat_energy
-								colony_type = col_generator
 								colony_type = col_mining
 								colony_type = col_habitat_mining
 								colony_type = col_farming
@@ -2862,7 +3088,6 @@ planet_event = {
 							OR = {
 								colony_type = col_generator
 								colony_type = col_habitat_energy
-								colony_type = col_generator
 							}
 						}
 					}
@@ -3168,7 +3393,6 @@ planet_event = {
 							NOR = {
 								colony_type = col_generator
 								colony_type = col_habitat_energy
-								colony_type = col_generator
 								colony_type = col_mining
 								colony_type = col_habitat_mining
 								colony_type = col_farming
@@ -3236,7 +3460,6 @@ planet_event = {
 							OR = {
 								colony_type = col_generator
 								colony_type = col_habitat_energy
-								colony_type = col_generator
 							}
 						}
 					}
@@ -3542,7 +3765,6 @@ planet_event = {
 							NOR = {
 								colony_type = col_generator
 								colony_type = col_habitat_energy
-								colony_type = col_generator
 								colony_type = col_mining
 								colony_type = col_habitat_mining
 								colony_type = col_farming
@@ -3619,8 +3841,7 @@ country_event = {
 			OR = { has_component = NSC_FREEBOOTER_BOARDING_POD_1 has_component = NSC_FREEBOOTER_BOARDING_POD_2 }
 		}
 		exists = fromfromfrom
-		fromfromfrom = {
-			# OR = {
+		fromfromfrom = {	# OR = {
 			is_ship_class = shipclass_military			# Should be always mobile
 			# 	fleet = {
 			# 		fleet_size < 2
@@ -3713,8 +3934,7 @@ ship_event = {
 	id = nsc_freebooter.37
 	hide_window = yes
 	is_triggered_only = yes
-	immediate = {
-		# log = "From=\\[From.GetName]; fromfrom=\\[fromfrom.GetName]"
+	immediate = {	# log = "From=\\[From.GetName]; fromfrom=\\[fromfrom.GetName]"
 		if = {
 			limit = {
 				exists = from
@@ -3802,8 +4022,7 @@ country_event = {
 	id = nsc_freebooter.3701
 	hide_window = yes
 	is_triggered_only = yes
-	immediate = {
-		# log = "BOARDING Project Fail: This = \\[This.GetName] From = \\[From.GetName], fromfrom = \\[fromfrom.GetName]"
+	immediate = {	# log = "BOARDING Project Fail: This = \\[This.GetName] From = \\[From.GetName], fromfrom = \\[fromfrom.GetName]"
 		if = {
 			limit = {
 				exists = fromfrom
@@ -3903,8 +4122,7 @@ country_event = {
 	location = root.capital_scope
 	is_triggered_only = yes
 	immediate = {
-		if = {
-			# TODO this is just a cheap fallback, needs proper event message for new ruler
+		if = {	# TODO this is just a cheap fallback, needs proper event message for new ruler
 			limit = { NOT = { exists = root.ruler } }
 			random_owned_leader = {
 				limit = {
@@ -3921,8 +4139,7 @@ country_event = {
 				prev = { assign_leader = prev }
 			}
 		}
-		if = {
-			# TODO this is just a cheap fallback, needs proper event message for new ruler
+		if = {	# TODO this is just a cheap fallback, needs proper event message for new ruler
 			limit = { NOT = { exists = root.ruler } }
 			random_owned_leader = {
 				limit = { leader_class = official }
@@ -3960,8 +4177,8 @@ country_event = {
 			}
 			settings = {
 				spawn_debris = no
-				# can_upgrade = no
-				can_change_composition = no
+				can_upgrade = yes
+				can_change_composition = yes
 				uses_naval_capacity = no
 			}
 		}
@@ -4129,8 +4346,7 @@ ship_event = {
 				}
 				owner = {
 					set_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened
-					add_resource = {
-						# energy = -2000
+					add_resource = {	# energy = -2000
 						alloys = -3000
 						volatile_motes = -100
 						exotic_gases = -100
@@ -4156,8 +4372,7 @@ ship_event = {
 				}
 				owner = {
 					set_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened
-					add_resource = {
-						# energy = -2000
+					add_resource = {	# energy = -2000
 						alloys = -3000
 						volatile_motes = -100
 						exotic_gases = -100
@@ -4169,12 +4384,15 @@ ship_event = {
 			# All other chance to get the ship
 			every_playable_country = {
 				limit = {
-					is_gestalt = no
 					root.solar_system = {
 						is_surveyed = { who = prev status = yes }
 						has_access_fleet = prev
 					}
-					NOR = { has_special_project = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT has_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened }
+					NOR = {
+						is_gestalt = yes
+						has_special_project = NSC_FREEBOOTER_KHAN_SHIP_DISABLED_PROJECT
+						has_country_flag = nsc_freebooter_khan_flagship_repair_event_already_happened
+					}
 					has_resource = { type = energy amount > 2000 }
 					has_resource = { type = alloys amount > 3000 }
 					has_resource = { type = volatile_motes amount > 100 }
@@ -4186,8 +4404,7 @@ ship_event = {
 						can_access_system = root.solar_system						# performance-intensive trigger!
 					}
 				}
-				add_resource = {
-					# energy = -2000
+				add_resource = {	# energy = -2000
 					alloys = -3000
 					volatile_motes = -100
 					exotic_gases = -100
@@ -4254,8 +4471,7 @@ event = {
 	id = nsc_freebooter.99
 	hide_window = yes
 	is_triggered_only = yes
-	immediate = {
-		# DEPRECATE pc_nsc_freebooter_habitat?
+	immediate = {	# DEPRECATE pc_nsc_freebooter_habitat?
 		if = {
 			limit = { NOT = { has_global_flag = has_nsc_freebooters_mod } }
 			set_global_flag = has_nsc_freebooters_mod
@@ -4311,5 +4527,137 @@ event = {
 		# 		set_controller = prev
 		# 	}
 		# }
+		# Fix Vanilla Survey Treasure Hunter Shattered world grand_archive.8051
+		random_playable_country = {
+			limit = {
+				should_use_increased_treasure_trove_drops = yes
+				has_event_chain = "treasure_hunters_origin_story_chain"
+				has_point_of_interest = { poi = treasure_hunters_explore_system_poi.1 }
+				any_system = {
+					is_point_of_interest = {
+						id = treasure_hunters_explore_system_poi.1
+						event_chain = treasure_hunters_origin_story_chain
+						owner = prev
+					}
+					any_system_planet = {
+						is_surveyed = { who = prev status = yes }
+						has_planet_flag = shattered_ytterite_world
+					}
+				}
+			}
+			random_system = {
+				limit = {
+					is_point_of_interest = {
+						id = treasure_hunters_explore_system_poi.1
+						event_chain = treasure_hunters_origin_story_chain
+						owner = prev
+					}
+					any_system_planet = {
+						is_surveyed = { who = prev status = yes }
+						has_planet_flag = shattered_ytterite_world
+					}
+				}
+				prev = {
+					country_event = { id = grand_archive.8052 scopes = { from = prev } }
+				}
+			}
+		}
+		# Fix Vanilla Survey Treasure Hunter Black Needle Base grand_archive.8101
+		random_playable_country = {
+			limit = {
+				should_use_increased_treasure_trove_drops = yes
+				has_event_chain = "treasure_hunters_origin_story_chain"
+				has_point_of_interest = { poi = black_needle_base_system_poi }
+				any_system = {
+					is_point_of_interest = {
+						id = black_needle_base_system_poi
+						event_chain = treasure_hunters_origin_story_chain
+						owner = prev
+					}
+					any_system_planet = {
+						is_surveyed = { who = prev status = yes }
+						has_deposit = d_black_needle_base
+					}
+				}
+			}
+			random_system = {
+				limit = {
+					is_point_of_interest = {
+						id = black_needle_base_system_poi
+						event_chain = treasure_hunters_origin_story_chain
+						owner = prev
+					}
+					any_system_planet = {
+						is_surveyed = { who = prev status = yes }
+						has_deposit = d_black_needle_base
+					}
+				}
+				prev = {
+					country_event = { id = grand_archive.8102 scopes = { from = prev } }
+				}
+			}
+		}
+		# Fix Vanilla Survey Treasure Hunter Smeegibb shelter grand_archive.8201
+		random_playable_country = {
+			limit = {
+				should_use_increased_treasure_trove_drops = yes
+				has_event_chain = "treasure_hunters_origin_story_chain"
+				has_point_of_interest = { poi = smeegibb_shelter_system_poi.1  }
+				any_system = {
+					is_point_of_interest = {
+						id = smeegibb_shelter_system_poi.1
+						event_chain = treasure_hunters_origin_story_chain
+						owner = prev
+					}
+					any_system_planet = {
+						is_surveyed = { who = prev status = yes }
+						has_planet_flag = smeegibb_shelter
+					}
+				}
+			}
+			random_system = {
+				limit = {
+					is_point_of_interest = {
+						id = smeegibb_shelter_system_poi.1
+						event_chain = treasure_hunters_origin_story_chain
+						owner = prev
+					}
+					any_system_planet = {
+						is_surveyed = { who = prev status = yes }
+						has_planet_flag = smeegibb_shelter
+					}
+				}
+				prev = {
+					country_event = { id = grand_archive.8202 scopes = { from = prev } }
+				}
+			}
+		}
+		# Fix vanilla treasure hunter "BLACK_NEEDLE_BASE_BOMBARD"
+		random_playable_country = {
+			limit = {
+				should_use_increased_treasure_trove_drops = yes
+				OR = {
+					has_country_flag = black_needle_base_ransacked
+					has_country_flag = black_needle_base_stolen_tech
+				}
+				any_planet_within_border = {
+					has_planet_flag = planet_defended_forbid_colonization
+					has_deposit = d_black_needle_base
+				}
+			}
+			random_planet_within_border = {
+				limit = {
+					has_planet_flag = planet_defended_forbid_colonization
+					has_deposit = d_black_needle_base
+				}
+				remove_deposit = d_black_needle_base
+				remove_planet_flag = planet_defended_forbid_colonization
+				set_planet_flag = black_needle_base_destroyed
+				if = {
+					limit = { NOT = { has_deposit = d_abandoned_black_needle_base } }
+					add_deposit = d_abandoned_black_needle_base
+				}
+			}
+		}
 	}
 }

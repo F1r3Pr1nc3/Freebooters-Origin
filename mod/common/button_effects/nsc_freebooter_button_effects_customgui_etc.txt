@@ -363,11 +363,11 @@ effect_nsc_freebooter_leader_making_custom = {
 						leader_trait_resilient = { remove_trait = leader_trait_resilient }
 						leader_trait_adaptable = { remove_trait = leader_trait_adaptable }
 						leader_trait_restrained = { remove_trait = leader_trait_restrained }
-						# leader_trait_inspiring = { remove_trait = leader_trait_inspiring } TODO
-						leader_trait_butcher = { remove_trait = leader_trait_butcher }
+						leader_trait_crusader = { remove_trait = leader_trait_crusader }
 						leader_trait_butcher = { remove_trait = leader_trait_butcher }
 						leader_trait_energy_weapon_specialist = { remove_trait = leader_trait_energy_weapon_specialist }
 						leader_trait_mercenary_warrior = { remove_trait = leader_trait_mercenary_warrior }
+						leader_trait_dreaded = { remove_trait = leader_trait_dreaded }
 					}
 				}
 				# Set leader trait phase
@@ -387,11 +387,11 @@ effect_nsc_freebooter_leader_making_custom = {
 						add_resource = { energy = -500 consumer_goods = -500 }
 						event_target:nsc_freebooter_leader_making_target = { add_trait = leader_trait_restrained }
 					}
-					# if = {
-					# 	limit = { has_country_flag = nsc_freebooter_leader_trait_general_4 }
-					# 	add_resource = { energy = -500 consumer_goods = -500 }
-					# 	event_target:nsc_freebooter_leader_making_target = { add_trait = leader_trait_inspiring }
-					# }
+					if = {
+						limit = { has_country_flag = nsc_freebooter_leader_trait_general_4 }
+						add_resource = { energy = -500 consumer_goods = -500 }
+						event_target:nsc_freebooter_leader_making_target = { add_trait = leader_trait_crusader }
+					}
 					if = {
 						limit = { has_country_flag = nsc_freebooter_leader_trait_general_5 }
 						add_resource = { energy = -500 consumer_goods = -500 }
@@ -400,7 +400,7 @@ effect_nsc_freebooter_leader_making_custom = {
 					if = {
 						limit = { has_country_flag = nsc_freebooter_leader_trait_general_6 }
 						add_resource = { energy = -500 consumer_goods = -500 }
-						event_target:nsc_freebooter_leader_making_target = { add_trait = leader_trait_butcher }
+						event_target:nsc_freebooter_leader_making_target = { add_trait = leader_trait_heavy_hitter }
 					}
 					if = {
 						limit = { has_country_flag = nsc_freebooter_leader_trait_general_7 }
@@ -411,6 +411,11 @@ effect_nsc_freebooter_leader_making_custom = {
 						limit = { has_country_flag = nsc_freebooter_leader_trait_general_8 }
 						add_resource = { energy = -500 consumer_goods = -500 }
 						event_target:nsc_freebooter_leader_making_target = { add_trait = leader_trait_mercenary_warrior }
+					}
+					if = {
+						limit = { has_country_flag = nsc_freebooter_leader_trait_general_9 }
+						add_resource = { energy = -500 consumer_goods = -500 }
+						event_target:nsc_freebooter_leader_making_target = { add_trait = leader_trait_dreaded }
 					}
 				}
 			}

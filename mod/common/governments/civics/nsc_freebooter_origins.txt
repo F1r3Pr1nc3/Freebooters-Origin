@@ -197,6 +197,7 @@ origin_nsc_freebooter_federations = {
 	modifier = {
 		station_gatherers_produces_mult = 1.0
 		country_power_projection_influence_produces_add = 2
+		# Void_dwellers
 		megastructures_habitat_cost_mult = -0.25
 		habitat_districts_building_slots_add = 0.25
 		habitat_max_districts_add = 2

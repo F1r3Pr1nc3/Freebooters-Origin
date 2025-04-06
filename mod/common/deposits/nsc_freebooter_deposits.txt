@@ -8,7 +8,7 @@ d_nsc_freebooter_habitat = {
 		planet_max_buildings_add = 6
 	}
 	potential = {
-		is_planet_class = pc_habitat # always = no # pc_nsc_freebooter_habitat
+		merg_is_habitat = yes # always = no # pc_nsc_freebooter_habitat
 	}
 	drop_weight = { weight = 0 }
 }

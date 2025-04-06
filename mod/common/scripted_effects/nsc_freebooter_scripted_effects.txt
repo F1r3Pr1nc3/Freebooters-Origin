@@ -1,5 +1,6 @@
 # This = country
 create_khan_dummy = {
+	optimize_memory
 	if = { # Kill the old clone of the ruler
 		limit = {
 			any_owned_leader = {
@@ -72,6 +73,7 @@ create_khan_dummy = {
 }
 
 nsc_freebooter_the_duel_event_result_reset_effect = {
+	optimize_memory
 	switch = { trigger = has_country_flag
 		# aggressive
 		nsc_freebooter_the_duel_evt_option_aggressive_random_1 = { remove_country_flag = nsc_freebooter_the_duel_evt_option_aggressive_random_1 }
