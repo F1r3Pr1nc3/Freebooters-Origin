@@ -1,0 +1,106 @@
+# BETA TODO TEST
+namespace = nsc_freebooter
+# Event: Echoes of Inefficiency
+ship_event = {
+	id = nsc_freebooter.84
+	title = "nsc_freebooter.84.name"
+	desc = "nsc_freebooter.84.desc"
+	picture = GFX_evt_nuclear_explosion
+	show_sound = event_alien_signal
+	location = from
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		exists = from
+		from = {
+			OR = { has_planet_flag = ashendell has_planet_flag = eryndors_lament }
+		}
+	}
+	immediate = { }
+	option = {
+		name = "nsc_freebooter.84.a"
+		custom_tooltip = proclaim_superiority_desc # "Purge the records of the Department of Galactic Efficiency."
+		owner = {
+			add_resource = { energy = 100 alloys = 100 }
+			add_modifier = { modifier = nsc_freebooter_historical_revisionism years = 5 }
+		}
+		ai_chance = {
+			factor = 100
+		}
+	}
+	option = {
+		name = "nsc_freebooter.84.b"
+		custom_tooltip = "nsc_freebooter.84.b.tooltip"
+		default_hide_option = yes
+		owner = {
+			add_resource = { society_research = 2000 }
+			add_modifier = { modifier = nsc_freebooter_bureaucratic_resentment years = 10 }
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					owner = {
+						is_ai = no
+						OR = {
+							has_origin = origin_nsc_freebooter
+							has_origin = origin_nsc_freebooter_federations
+						}
+					}
+				}
+				from = {
+					planet_event = { id = nsc_freebooter.85 }
+				}
+			}
+		}
+	}
+}
+
+# Event: Uncovering the Ruins
+# Event: Investigating Echoes of the Arcology
+planet_event = {
+	id = nsc_freebooter.85
+	title = "nsc_freebooter.85.name"
+	desc = "nsc_freebooter.85.desc"
+	picture = GFX_evt_alien_ruins
+	show_sound = event_mystic_reveal
+	location = ROOT
+	is_triggered_only = yes
+	# trigger = {
+	# 	NOT = { has_deposit = d_ruined_arcology }
+	# }
+	immediate = {
+		if = {
+			limit = { has_planet_flag = ashendell }
+			add_deposit = d_zro_deposit_2
+			remove_planet_flag = ashendell
+		}
+		else_if = {
+			limit = { has_planet_flag = eryndors_lament }
+			owner = {
+				add_resource = { society_research = 300 }
+			}
+			remove_planet_flag = eryndors_lament
+		}
+	}
+	after = {
+		hidden_effect = {
+			from.owner = {
+				if = {
+					limit = {
+						is_ai = no
+						has_grand_archive_dlc = yes
+						count_playable_country = { count = 0
+							limit = { is_ai = no has_origin = origin_treasure_hunters }
+						}
+						count_playable_country = { count < 2
+							limit = { is_ai = no has_origin = origin_nsc_freebooter }
+						}
+					}
+					add_relic = r_celestial_chart_0 # grand_archive.2220
+					country_event = { id = grand_archive.8000 days = 1 }
+				}
+			}
+		}
+	}
+	option = { name = INCREDIBLE custom_tooltip = "A remarkable discovery amidst the ruins." }
+}

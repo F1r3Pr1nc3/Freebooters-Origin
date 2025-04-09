@@ -151,6 +151,7 @@ country_event = {
 					max_steps = 3
 					random_system_planet = {
 						limit = { is_colonizable = yes is_colony = no }
+						prevent_anomaly = yes
 						save_event_target_as = target_planet
 						# change_pc = "pc_tropical"
 						# select_pre_ftl_origin = yes
@@ -167,7 +168,7 @@ country_event = {
 								namelist = this
 								gender = this
 								traits = {
-									ideal_planet_class = this
+									ideal_planet_class = pc_tropical
 									# trait = "trait_rapid_breeders"						# +2
 									# trait = "trait_conformists"							# +2
 									# trait = "trait_strong"								# +1
@@ -282,6 +283,33 @@ country_event = {
 										set_name = major_orbital_energy
 									}
 								}
+								add_modifier = { modifier = bleak_planet }
+								add_modifier = { modifier = unbalanced_ecosystem }
+								add_modifier = { modifier = irradiated_planet }
+								add_modifier = { modifier = irradiated_wasteland }
+								add_modifier = { modifier = hazardous_weather }
+								add_modifier = { modifier = unstable_tectonics }
+								add_modifier = { modifier = wasteland_radiation }
+
+								add_deposit = d_radioactive_wasteland
+								add_deposit = d_radioactive_wasteland
+								add_deposit = d_radioactive_wasteland
+								add_deposit = d_radioactive_ruins
+								add_deposit = d_tomb_world_wasteland
+								add_deposit = d_crater
+								add_deposit = d_bomb_crater
+								add_deposit = d_ruined_building_blocker
+								add_deposit = d_dangerous_wildlife_blocker
+								add_deposit = d_noxious_swamp
+								add_deposit = d_noxious_swamp
+								add_deposit = d_ruined_arcology
+								add_deposit = d_ancient_battlefield
+								add_deposit = d_former_battlefield
+								set_name = "NAME_Ashendell"
+								add_anomaly = { category = VARKIS_REMNANT_CAT }
+								set_planet_flag = ashendell
+								change_pc = pc_nuked
+								add_modifier = { modifier = terraforming_candidate }
 							}
 							while = { count = 3
 								random_planet_army = {
@@ -309,6 +337,9 @@ country_event = {
 							}
 							set_origin = origin_nsc_freebooter
 							set_country_flag = early_space_age
+							set_faction_hostility = { set_hostile = yes target = root }
+							add_opinion_modifier = { modifier = opinion_traitor_to_empire who = root }
+							add_opinion_modifier = { modifier = opinion_flavors_down who = root }
 							country_event = { id = preftl.1099 days = 1880 }
 						}
 					}
@@ -323,8 +354,9 @@ country_event = {
 					max_steps = 4
 					random_system_planet = {
 						limit = { is_colonizable = yes is_colony = no }
+						prevent_anomaly = yes
 						save_event_target_as = target_planet
-						change_pc = "pc_desert"
+						# change_pc = "pc_desert"
 						# select_pre_ftl_origin = yes
 						event_target:freebooter_species = {
 							create_species = {
@@ -339,7 +371,7 @@ country_event = {
 								namelist = this
 								gender = this
 								traits = {
-									ideal_planet_class = this
+									ideal_planet_class = pc_desert
 									# trait = "trait_intelligent"								# They have a unique form of communication and intelligence.
 									# trait = "trait_conformists"								# They are loyal to their leaders.
 									trait = "trait_strong"									# +1
@@ -449,6 +481,34 @@ country_event = {
 										set_name = major_orbital_energy
 									}
 								}
+
+								add_modifier = { modifier = bleak_planet }
+								add_modifier = { modifier = unbalanced_ecosystem }
+								add_modifier = { modifier = irradiated_planet }
+								add_modifier = { modifier = irradiated_wasteland }
+								add_modifier = { modifier = hazardous_weather }
+								add_modifier = { modifier = unstable_tectonics }
+								add_modifier = { modifier = wasteland_radiation }
+
+								add_deposit = d_radioactive_wasteland
+								add_deposit = d_radioactive_wasteland
+								add_deposit = d_radioactive_wasteland
+								add_deposit = d_radioactive_ruins
+								add_deposit = d_tomb_world_wasteland
+								add_deposit = d_crater
+								add_deposit = d_bomb_crater
+								add_deposit = d_ruined_building_blocker
+								add_deposit = d_dangerous_wildlife_blocker
+								add_deposit = d_noxious_swamp
+								add_deposit = d_noxious_swamp
+								add_deposit = d_ruined_arcology
+								add_deposit = d_ancient_battlefield
+								add_deposit = d_former_battlefield
+								set_name = "NAME_Eryndors"
+								add_anomaly = { category = VARKIS_REMNANT_CAT }
+								set_planet_flag = eryndors_lament
+								change_pc = pc_nuked
+								add_modifier = { modifier = terraforming_candidate }
 							}
 							while = { count = 3
 								random_planet_army = {
@@ -477,6 +537,9 @@ country_event = {
 						}
 						set_origin = origin_nsc_freebooter
 						set_country_flag = early_space_age
+						set_faction_hostility = { set_hostile = yes target = root }
+						add_opinion_modifier = { modifier = opinion_traitor_to_empire who = root }
+						add_opinion_modifier = { modifier = opinion_flavors_down who = root }
 						country_event = { id = preftl.1099 days = 2560 }
 					}
 				}
@@ -485,18 +548,6 @@ country_event = {
 		set_spawn_system_batch = end
 	}
 	after = {
-		if = {
-			limit = {
-				is_ai = no
-				has_grand_archive_dlc = yes
-				count_playable_country = { count = 0
-					limit = { is_ai = no has_origin = origin_treasure_hunters }
-				}
-			}
-			add_relic = r_celestial_chart_0 # grand_archive.2220
-			country_event = { id = grand_archive.8000 days = 1 }
-		}
-
 		create_fleet = {
 			name = "NAME_Wrecker_Base"
 			effect = {
@@ -2710,10 +2761,7 @@ planet_event = {
 				if = {
 					limit = {
 						root = {
-							OR = {
-								colony_type = col_generator
-								colony_type = col_habitat_energy
-							}
+							OR = { colony_type = col_generator colony_type = col_habitat_energy }
 						}
 					}
 					add_resource = { energy = 50 }
@@ -3085,10 +3133,7 @@ planet_event = {
 				if = {
 					limit = {
 						root = {
-							OR = {
-								colony_type = col_generator
-								colony_type = col_habitat_energy
-							}
+							OR = { colony_type = col_generator colony_type = col_habitat_energy }
 						}
 					}
 					add_resource = { energy = 80 }
@@ -3457,10 +3502,7 @@ planet_event = {
 				if = {
 					limit = {
 						root = {
-							OR = {
-								colony_type = col_generator
-								colony_type = col_habitat_energy
-							}
+							OR = { colony_type = col_generator colony_type = col_habitat_energy }
 						}
 					}
 					add_resource = { energy = 100 }
@@ -4527,108 +4569,134 @@ event = {
 		# 		set_controller = prev
 		# 	}
 		# }
-		# Fix Vanilla Survey Treasure Hunter Shattered world grand_archive.8051
 		random_playable_country = {
 			limit = {
 				should_use_increased_treasure_trove_drops = yes
 				has_event_chain = "treasure_hunters_origin_story_chain"
-				has_point_of_interest = { poi = treasure_hunters_explore_system_poi.1 }
-				any_system = {
-					is_point_of_interest = {
-						id = treasure_hunters_explore_system_poi.1
-						event_chain = treasure_hunters_origin_story_chain
-						owner = prev
-					}
-					any_system_planet = {
-						is_surveyed = { who = prev status = yes }
-						has_planet_flag = shattered_ytterite_world
-					}
+				OR = {
+					has_point_of_interest = { poi = treasure_hunters_explore_system_poi.1 }
+					has_point_of_interest = { poi = black_needle_base_system_poi }
+					has_point_of_interest = { poi = smeegibb_shelter_system_poi.1 }
 				}
 			}
-			random_system = {
+			weights = { base = 1
+				modifier = { add = 99 is_ai = no }
+			}
+			if = { # Fix Vanilla Survey Treasure Hunter Shattered world grand_archive.8051
 				limit = {
-					is_point_of_interest = {
-						id = treasure_hunters_explore_system_poi.1
-						event_chain = treasure_hunters_origin_story_chain
-						owner = prev
-					}
-					any_system_planet = {
-						is_surveyed = { who = prev status = yes }
-						has_planet_flag = shattered_ytterite_world
+					has_point_of_interest = { poi = treasure_hunters_explore_system_poi.1 }
+					any_system = {
+						has_star_flag = hidden_treasure_system
+						is_point_of_interest = {
+							id = treasure_hunters_explore_system_poi.1
+							event_chain = treasure_hunters_origin_story_chain
+							owner = prev
+						}
+						OR = {
+							has_owner = no
+							NOT = { exists = starbase }
+							space_owner = { is_same_empire = prevprevprev }
+						}
+						any_system_planet = {
+							is_surveyed = { who = prev status = yes }
+							has_planet_flag = shattered_ytterite_world
+						}
 					}
 				}
-				prev = {
-					country_event = { id = grand_archive.8052 scopes = { from = prev } }
+				random_system = {
+					limit = {
+						has_star_flag = hidden_treasure_system
+						is_point_of_interest = {
+							id = treasure_hunters_explore_system_poi.1
+							event_chain = treasure_hunters_origin_story_chain
+							owner = prev
+						}
+						any_system_planet = {
+							is_surveyed = { who = prev status = yes }
+							has_planet_flag = shattered_ytterite_world
+						}
+					}
+					prev = {
+						country_event = { id = grand_archive.8052 scopes = { from = prev } }
+					}
 				}
 			}
-		}
-		# Fix Vanilla Survey Treasure Hunter Black Needle Base grand_archive.8101
-		random_playable_country = {
-			limit = {
-				should_use_increased_treasure_trove_drops = yes
-				has_event_chain = "treasure_hunters_origin_story_chain"
-				has_point_of_interest = { poi = black_needle_base_system_poi }
-				any_system = {
-					is_point_of_interest = {
-						id = black_needle_base_system_poi
-						event_chain = treasure_hunters_origin_story_chain
-						owner = prev
-					}
-					any_system_planet = {
-						is_surveyed = { who = prev status = yes }
-						has_deposit = d_black_needle_base
-					}
-				}
-			}
-			random_system = {
+			else_if = { # Fix Vanilla Survey Treasure Hunter Black Needle Base grand_archive.8101
 				limit = {
-					is_point_of_interest = {
-						id = black_needle_base_system_poi
-						event_chain = treasure_hunters_origin_story_chain
-						owner = prev
-					}
-					any_system_planet = {
-						is_surveyed = { who = prev status = yes }
-						has_deposit = d_black_needle_base
+					has_point_of_interest = { poi = treasure_hunters_explore_system_poi.1 }
+					any_system = {
+						has_star_flag = hidden_treasure_system
+						is_point_of_interest = {
+							id = black_needle_base_system_poi
+							event_chain = treasure_hunters_origin_story_chain
+							owner = prev
+						}
+						OR = {
+							has_owner = no
+							NOT = { exists = starbase }
+							space_owner = { is_same_empire = prevprevprev }
+						}
+						any_system_planet = {
+							is_surveyed = { who = prev status = yes }
+							has_deposit = d_black_needle_base
+						}
 					}
 				}
-				prev = {
-					country_event = { id = grand_archive.8102 scopes = { from = prev } }
+				random_system = {
+					limit = {
+						has_star_flag = hidden_treasure_system
+						is_point_of_interest = {
+							id = black_needle_base_system_poi
+							event_chain = treasure_hunters_origin_story_chain
+							owner = prev
+						}
+						any_system_planet = {
+							is_surveyed = { who = prev status = yes }
+							has_deposit = d_black_needle_base
+						}
+					}
+					prev = {
+						country_event = { id = grand_archive.8102 scopes = { from = prev } }
+					}
 				}
 			}
-		}
-		# Fix Vanilla Survey Treasure Hunter Smeegibb shelter grand_archive.8201
-		random_playable_country = {
-			limit = {
-				should_use_increased_treasure_trove_drops = yes
-				has_event_chain = "treasure_hunters_origin_story_chain"
-				has_point_of_interest = { poi = smeegibb_shelter_system_poi.1  }
-				any_system = {
-					is_point_of_interest = {
-						id = smeegibb_shelter_system_poi.1
-						event_chain = treasure_hunters_origin_story_chain
-						owner = prev
-					}
-					any_system_planet = {
-						is_surveyed = { who = prev status = yes }
-						has_planet_flag = smeegibb_shelter
-					}
-				}
-			}
-			random_system = {
+			else_if = { # Fix Vanilla Survey Treasure Hunter Smeegibb shelter grand_archive.8201
 				limit = {
-					is_point_of_interest = {
-						id = smeegibb_shelter_system_poi.1
-						event_chain = treasure_hunters_origin_story_chain
-						owner = prev
-					}
-					any_system_planet = {
-						is_surveyed = { who = prev status = yes }
-						has_planet_flag = smeegibb_shelter
+					has_point_of_interest = { poi = smeegibb_shelter_system_poi.1 }
+					any_system = {
+						has_star_flag = hidden_treasure_system
+						is_point_of_interest = {
+							id = smeegibb_shelter_system_poi.1
+							event_chain = treasure_hunters_origin_story_chain
+							owner = prev
+						}
+						OR = {
+							has_owner = no
+							NOT = { exists = starbase }
+							space_owner = { is_same_empire = prevprevprev }
+						}
+						any_system_planet = {
+							is_surveyed = { who = prev status = yes }
+							has_planet_flag = smeegibb_shelter
+						}
 					}
 				}
-				prev = {
-					country_event = { id = grand_archive.8202 scopes = { from = prev } }
+				random_system = {
+					limit = {
+						has_star_flag = hidden_treasure_system
+						is_point_of_interest = {
+							id = smeegibb_shelter_system_poi.1
+							event_chain = treasure_hunters_origin_story_chain
+							owner = prev
+						}
+						any_system_planet = {
+							is_surveyed = { who = prev status = yes }
+							has_planet_flag = smeegibb_shelter
+						}
+					}
+					prev = {
+						country_event = { id = grand_archive.8202 scopes = { from = prev } }
+					}
 				}
 			}
 		}
@@ -4639,17 +4707,19 @@ event = {
 				OR = {
 					has_country_flag = black_needle_base_ransacked
 					has_country_flag = black_needle_base_stolen_tech
+					has_country_flag = smeegibb_arc_site_spawned
 				}
-				any_planet_within_border = {
-					has_planet_flag = planet_defended_forbid_colonization
-					has_deposit = d_black_needle_base
+				NOT = { has_point_of_interest = { poi = black_needle_base_system_poi } }
+				any_system_within_border = {
+					has_star_flag = hidden_treasure_system
+					any_system_planet = {
+						OR = { has_planet_flag = planet_defended_forbid_colonization has_planet_flag = can_have_scripted_bombardment }
+						has_deposit = d_black_needle_base
+					}
 				}
 			}
 			random_planet_within_border = {
-				limit = {
-					has_planet_flag = planet_defended_forbid_colonization
-					has_deposit = d_black_needle_base
-				}
+				limit = { has_planet_flag = planet_defended_forbid_colonization has_deposit = d_black_needle_base }
 				remove_deposit = d_black_needle_base
 				remove_planet_flag = planet_defended_forbid_colonization
 				set_planet_flag = black_needle_base_destroyed

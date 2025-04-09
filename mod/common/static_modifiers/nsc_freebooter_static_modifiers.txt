@@ -86,3 +86,10 @@ nsc_freebooter_satrapy_owner_naval_cap_bonus = {
 nsc_freebooter_forced_border_open_no_rival_empire_modifier = {
 	max_rivalries = -1000
 }
+
+nsc_freebooter_bureaucratic_resentment = {
+	pop_happiness = -0.10
+}
+nsc_freebooter_historical_revisionism = {
+	country_society_research_produces_mult = -0.10
+}

@@ -1,0 +1,20 @@
+# Anomaly: Echoes of the Arcology. Compare DISTAR_FOES_CAT
+VARKIS_REMNANT_CAT = {
+	desc = VARKIS_REMNANT_CAT_DESC
+	picture = GFX_evt_ancient_databank
+	should_ai_use = no
+	max_once = yes
+	max_once_global = yes
+	spawn_chance = {
+		base = 0
+		modifier = {
+			add = 1000
+			OR = {
+				has_planet_flag = ashendell
+				has_planet_flag = eryndors_lament
+			}
+		}
+	}
+	on_success = nsc_freebooter.84
+	level = 2
+}

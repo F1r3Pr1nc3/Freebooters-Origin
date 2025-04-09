@@ -50,6 +50,7 @@ has_not_federations_dlc = { # Necessary for prescripted empires, which do not su
 
 should_use_increased_treasure_trove_drops = {
 	optimize_memory
+	is_country_type = default
 	OR = {
 		has_origin = origin_nsc_freebooter
 		has_origin = origin_nsc_freebooter_federations
