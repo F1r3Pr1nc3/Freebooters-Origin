@@ -61,7 +61,7 @@ planet_event = {
 	id = nsc_freebooter.85
 	title = "nsc_freebooter.85.name"
 	desc = "nsc_freebooter.85.desc"
-	picture = GFX_evt_alien_ruins
+	picture = GFX_evt_relic_world_building
 	show_sound = event_mystic_reveal
 	location = ROOT
 	is_triggered_only = yes
@@ -102,5 +102,5 @@ planet_event = {
 			}
 		}
 	}
-	option = { name = INCREDIBLE custom_tooltip = "A remarkable discovery amidst the ruins." }
+	option = { name = INCREDIBLE custom_tooltip = "nsc_freebooter.85.a.tooltip" }
 }

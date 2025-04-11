@@ -1,4 +1,4 @@
-version="3.14.15926.7"
+version="3.14.15926.8"
 tags={
 	"Origin"
 	"Gameplay"
@@ -8,6 +8,6 @@ tags={
 	"Habitats"
 }
 picture="thumbnail.png"
-name="Freebooters Origin (reborn) [3.14.☠]"
+name="Freebooters Origin [3.14.☠] (reborn)"
 supported_version="v3.14.*"
 remote_file_id="3253479588"

@@ -7,10 +7,11 @@ nsc_freebooter_gov_marauder_khanate = {
 	possible = {
 		is_freebooter_empire = yes
 		has_civic = nsc_freebooter_civic_great_khans_vision
+		has_country_flag = nsc_freebooter_khan_flagship_owner
 	}
 
 	weight = {
-		base = @gov_civic_override_weight
+		base = @gov_civic_override_weight # 50000
 	}
 }
 
@@ -35,6 +36,7 @@ gov_successor_khanate = {
 	}
 
 	weight = {
-		base = @gov_ai_weight
+		base = @gov_authority_swap_weight # 10000
+		# base = @gov_ai_weight # 100000
 	}
 }

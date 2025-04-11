@@ -813,6 +813,7 @@ country_event = {
 		# 	background = { category = "backgrounds" file = "00_solid.dds" }
 		# 	colors = { "red" "red" "null" "null" }
 		# }
+		# set_ai_personality =
 		ruler = {
 			add_trait = nsc_freebooter_leader_trait_ruler_great_khan
 			# set_skill = 10
@@ -4707,13 +4708,16 @@ event = {
 				OR = {
 					has_country_flag = black_needle_base_ransacked
 					has_country_flag = black_needle_base_stolen_tech
-					has_country_flag = smeegibb_arc_site_spawned
+					# has_country_flag = smeegibb_arc_site_spawned
 				}
 				NOT = { has_point_of_interest = { poi = black_needle_base_system_poi } }
 				any_system_within_border = {
 					has_star_flag = hidden_treasure_system
 					any_system_planet = {
-						OR = { has_planet_flag = planet_defended_forbid_colonization has_planet_flag = can_have_scripted_bombardment }
+						OR = {
+							has_planet_flag = planet_defended_forbid_colonization
+							has_planet_flag = can_have_scripted_bombardment
+						}
 						has_deposit = d_black_needle_base
 					}
 				}
