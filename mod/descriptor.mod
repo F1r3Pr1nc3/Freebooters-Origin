@@ -1,4 +1,4 @@
-version="3.14.15926.8"
+version="3.14.15926.9"
 tags={
 	"Origin"
 	"Gameplay"
@@ -6,6 +6,7 @@ tags={
 	"Marauders"
 	"NSC"
 	"Habitats"
+	"Fixes"
 }
 picture="thumbnail.png"
 name="Freebooters Origin [3.14.☠] (reborn)"

@@ -3066,7 +3066,7 @@ country_event = {
 
 	trigger = {
 		exists = event_target:black_needle_country
-		from = { is_same_value = event_target:black_needle_country }
+		from = { is_same_empire = event_target:black_needle_country }
 		fromfromfrom = { has_fleet_flag = black_needle_fleet }
 	}
 

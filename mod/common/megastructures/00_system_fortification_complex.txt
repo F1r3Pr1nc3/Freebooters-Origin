@@ -89,7 +89,7 @@ system_fortification_complex = {
 		modifier = { factor = 0.1
 			any_neighbor_system = {
 				has_owner = yes
-				owner = { NOT = { is_same_value = from } }
+				NOT = { is_owned_by = from }
 			}
 		}
 		modifier = { factor = 3

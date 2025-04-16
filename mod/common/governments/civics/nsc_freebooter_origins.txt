@@ -127,9 +127,7 @@ origin_nsc_freebooter_federations = {
 	}
 
 	possible = {
-		species_archetype = { NOT = { value = MACHINE } }
 		ethics = {
-			NOT = { value = ethic_gestalt_consciousness }
 			NOR = {
 				text = civic_tooltip_not_pacifist
 				value = ethic_pacifist
@@ -191,7 +189,9 @@ origin_nsc_freebooter_federations = {
 	description = "origin_nsc_freebooter_effect_tooltip"
 
 	potential = {
+		ethics = { NOT = { value = ethic_gestalt_consciousness } }
 		species_archetype = { NOT = { value = MACHINE } }
+		authority = { NOT = { value = auth_corporate } }
 	}
 
 	modifier = {
